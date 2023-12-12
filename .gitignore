@@ -1,0 +1,9 @@
+.settings
+.classpath
+.project
+*.log
+*.dem
+*.bz2
+replays/
+images/
+.venv/

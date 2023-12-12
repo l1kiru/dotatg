@@ -200,15 +200,15 @@ class PlayerInMatch:
         elif(additional_units is None): self.additional_units = additional_units
         else: raise Exception("[class player()] Неверный атрибут additional_units")
         #json
-        self.movement_by_time = movement_by_time
+        self.movement_by_time = json.dumps(list(movement_by_time))
         #json
-        self.lhts_by_time = lhts_by_time
+        self.lhts_by_time = json.dumps(list(lhts_by_time))
         #json
-        self.networth_by_time = networth_by_time
+        self.networth_by_time = json.dumps(list(networth_by_time))
         #json
-        self.purchase_by_time = purchase_by_time
+        self.purchase_by_time = json.dumps(list(purchase_by_time))
         #json
-        self.kills_by_time = kills_by_time
+        self.kills_by_time = json.dumps(list(kills_by_time))
 
     def get_INSERT_req(self):
         return """INSERT INTO match_player (match_id,account_id,rank_tier,
@@ -221,9 +221,9 @@ class PlayerInMatch:
                  hero_damage,hero_healing,tower_damage,
                  ability_upgrades_arr,additional_units,
                  movement_by_time,lhts_by_time,networth_by_time,
-                 purchase_by_time,kills_by_time,
+                 purchase_by_time,kills_by_time
                  ) 
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
     def get_data_tuple(self):
         return  (self.match_id,self.account_id,self.rank_tier,self.isRadiant,
                  self.player_slot,self.party_id,self.party_size,self.personaname,
@@ -254,7 +254,7 @@ class SteamProfile():
     def __init__(self,account_id,personaname,prof_name,avatar_src):
         #integer
         if(account_id is not None): self.account_id = account_id
-        else: raise Exception("[class steam_profile()] Неверный атрибут account_id")
+        #else: raise Exception("[class steam_profile()] Неверный атрибут account_id")
         #String
         self.personaname = personaname
         #String
@@ -307,8 +307,7 @@ class Database():
                     raise Exception(f"[class player()] Добавляем сам матч {_ex}")
                 #И в конце добавояем данные о том как каждый игрок сыграл этот матч
                 try:
-                    
-                    for i in range(len(players_insert_req_arr)):
+                    for i in range(10):
                         cursor.execute(players_insert_req_arr[i], players_data_tuples_arr[i])
                 except Exception as _ex:
                     raise Exception(f"[class player()] Добавляем данные о том как каждый игрок сыграл {_ex}")

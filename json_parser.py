@@ -7,20 +7,20 @@ def parse_replay(match_id):
     #opendota ?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a
     requests.post(url=f"https://api.opendota.com/api/request/{match_id}?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a")
     req = requests.get(url=f"https://api.opendota.com/api/matches/{match_id}?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a").json()
-    print("1")
+    print("parser 1")
     replay_link = f"http://replay{req['cluster']}.valve.net/570/{match_id}_{req['replay_salt']}.dem.bz2"
     req = requests.get(replay_link)
-    print("2")
+
     with open(f"match{match_id}-replay.dem.bz2", 'wb') as f: 
         f.write(req.content)
-    print("3")
+    print("parser 2")
     with open(f"match{match_id}-replay.dem", 'wb') as output_file, bz2.BZ2File(f'match{match_id}-replay.dem.bz2', 'rb') as input_file:
         output_file.write(input_file.read())
-    print("4")    
+    print("parser 3")    
     os.remove(f'match{match_id}-replay.dem.bz2')
-    os.system(f'curl localhost:5600 --data-binary "@match{match_id}-replay.dem" > replays/{match_id}.jsonlinesines')
+    os.system(f'curl 127.0.0.1:5600 --data-binary "@match{match_id}-replay.dem" > replays/{match_id}.jsonlinesines')
     os.remove(f"match{match_id}-replay.dem")
-    print("5")
+    print("parser 4")
 
     chname_slot = {}
     movement = [{},{},{},{},{},{},{},{},{},{}]
@@ -30,7 +30,7 @@ def parse_replay(match_id):
     purchase_log = [{},{},{},{},{},{},{},{},{},{}]
     combatlogd_slot = {}
     kills_log = [{},{},{},{},{},{},{},{},{},{}]
-    with open(f"replays\{match_id}.jsonlinesines") as file_:
+    with open(f"replays/{match_id}.jsonlinesines") as file_:
         counter = 0
         for line in file_.buffer:
             line_ =  json.loads(line.decode('utf-8'))
