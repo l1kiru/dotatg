@@ -134,10 +134,8 @@ class PlayerInMatch:
         elif(party_size is None): self.party_size = party_size
         else: raise Exception("[class player()] Неверный атрибут party_size")
         #string
-        if(personaname is not None): self.personaname = personaname
-        else: raise Exception("[class player()] Неверный атрибут personaname")
+        self.personaname = personaname
         #string 
-        #Может быть None и вообще любой строкой
         self.name = name
         #integer
         if(hero_id is not None): self.hero_id = hero_id

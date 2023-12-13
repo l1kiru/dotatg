@@ -8,14 +8,9 @@ from database import Match, PlayerInMatch, SteamProfile, Database
 from json_parser import parse_replay
 
 def main():
-    match_id = 7356874131
-
-    #res = requests.get(url=f"https://api.opendota.com/api/matches/{match_id}?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a")
-    #with open(f'{match_id}.json', 'wb') as f: 
-    #    f.write(res.content)
+    match_id = '7485861136'
 
     match_full_processing([f'{match_id}'])
-    #get_profile()
 
 
 def match_full_processing(matches_arr):
@@ -39,59 +34,37 @@ def match_full_processing(matches_arr):
             answer = get_match(match)
             #Достаем id всех участников матча
             for player in answer['players']:
-                #Получаем данные профиля  
-                plr = get_profile(player['account_id'])
-                if(player['account_id']!= None):
-                        steam_profile_ = SteamProfile(
-                        account_id=player['account_id'],personaname=plr['personaname'],
-                        prof_name=plr['name'],avatar_src=plr['avatar_src']
-                        )
-                        account_insert_req_arr.append(steam_profile_.get_INSERT_req())
-                        account_data_tuples_arr.append(steam_profile_.get_data_tuple())
-                        player_in_match_ = PlayerInMatch(
-                            match_id=player['match_id'],account_id=player['account_id'],
-                            rank_tier=player['rank_tier'],isRadiant=player['isRadiant'],
-                            player_slot=player['player_slot'],party_id=player['party_id'],
-                            party_size=player['party_size'],personaname=player['personaname'],
-                            name=player['name'],hero_id=player['hero_id'],level=player['level'],
-                            net_worth=player['net_worth'],kills=player['kills'],deaths=player['deaths'],
-                            assists=player['assists'],last_hits=player['last_hits'],denies=player['denies'],
-                            gold_per_min=player['gold_per_min'],xp_per_min=player['xp_per_min'],
-                            item_0=player['item_0'],item_1=player['item_1'],item_2=player['item_2'],
-                            item_3=player['item_3'],item_4=player['item_4'],item_5=player['item_5'],
-                            item_neutral=player['item_neutral'],backpack_0=player['backpack_0'],
-                            backpack_1=player['backpack_1'],backpack_2=player['backpack_2'],
-                            hero_damage=player['hero_damage'],hero_healing=player['hero_healing'],
-                            tower_damage=player['tower_damage'],ability_upgrades_arr=player['ability_upgrades_arr'],
-                            additional_units=get_additional_units(player['hero_id']),
-                            movement_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='movement'),
-                            lhts_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='lhts'),
-                            networth_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='networth'),
-                            purchase_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='purchase_log'),
-                            kills_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='kills_log')
-                            )
-                else:
-                    player_in_match_ = PlayerInMatch(
-                        match_id=player['match_id'],account_id='Unknown',
-                        rank_tier=player['rank_tier'],isRadiant=player['isRadiant'],
-                        player_slot=player['player_slot'],party_id=player['party_id'],
-                        party_size=player['party_size'],personaname='Anonymous',
-                        name='Anonymous',hero_id=player['hero_id'],level=player['level'],
-                        net_worth=player['net_worth'],kills=player['kills'],deaths=player['deaths'],
-                        assists=player['assists'],last_hits=player['last_hits'],denies=player['denies'],
-                        gold_per_min=player['gold_per_min'],xp_per_min=player['xp_per_min'],
-                        item_0=player['item_0'],item_1=player['item_1'],item_2=player['item_2'],
-                        item_3=player['item_3'],item_4=player['item_4'],item_5=player['item_5'],
-                        item_neutral=player['item_neutral'],backpack_0=player['backpack_0'],
-                        backpack_1=player['backpack_1'],backpack_2=player['backpack_2'],
-                        hero_damage=player['hero_damage'],hero_healing=player['hero_healing'],
-                        tower_damage=player['tower_damage'],ability_upgrades_arr=player['ability_upgrades_arr'],
-                        additional_units=get_additional_units(player['hero_id']),
-                        movement_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='movement'),
-                        lhts_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='lhts'),
-                        networth_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='networth'),
-                        purchase_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='purchase_log'),
-                        kills_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='kills_log')
+                #Получаем данные профиля
+                if(player['account_id']!= None):  
+                    plr = get_profile(player['account_id'])
+                    steam_profile_ = SteamProfile(
+                    account_id=player['account_id'],personaname=plr['personaname'],
+                    prof_name=plr['name'],avatar_src=plr['avatar_src']
+                    )
+                    account_insert_req_arr.append(steam_profile_.get_INSERT_req())
+                    account_data_tuples_arr.append(steam_profile_.get_data_tuple())
+                account_names = get_profile_names(player)
+                player_in_match_ = PlayerInMatch(
+                    match_id=player['match_id'],account_id=account_names['account_id'],
+                    rank_tier=player['rank_tier'],isRadiant=player['isRadiant'],
+                    player_slot=player['player_slot'],party_id=player['party_id'],
+                    party_size=player['party_size'],personaname=account_names['personaname'],
+                    name=account_names['name'],hero_id=player['hero_id'],level=player['level'],
+                    net_worth=player['net_worth'],kills=player['kills'],deaths=player['deaths'],
+                    assists=player['assists'],last_hits=player['last_hits'],denies=player['denies'],
+                    gold_per_min=player['gold_per_min'],xp_per_min=player['xp_per_min'],
+                    item_0=player['item_0'],item_1=player['item_1'],item_2=player['item_2'],
+                    item_3=player['item_3'],item_4=player['item_4'],item_5=player['item_5'],
+                    item_neutral=player['item_neutral'],backpack_0=player['backpack_0'],
+                    backpack_1=player['backpack_1'],backpack_2=player['backpack_2'],
+                    hero_damage=player['hero_damage'],hero_healing=player['hero_healing'],
+                    tower_damage=player['tower_damage'],ability_upgrades_arr=player['ability_upgrades_arr'],
+                    additional_units=get_additional_units(player['hero_id']),
+                    movement_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='movement'),
+                    lhts_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='lhts'),
+                    networth_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='networth'),
+                    purchase_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='purchase_log'),
+                    kills_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='kills_log')
                         )
                 players_insert_req_arr.append(player_in_match_.get_INSERT_req())
                 players_data_tuples_arr.append(player_in_match_.get_data_tuple())
@@ -146,6 +119,11 @@ def get_additional_units(hero_id):
     else:
         return None
 
+def get_profile_names(player):
+    if(player['account_id']!= None):
+        return player
+    else: return {'account_id': "Unknown",'personaname': "Anonymous",'name':"Anonymous"}
+
 #Возвращает имя в стиме и аватар
 def get_profile(profile_id):
     if not os.path.exists("images"):
@@ -158,12 +136,14 @@ def get_profile(profile_id):
                 os.mkdir(f"images/{profile_id}")
             #Получение аватарки
             answerProfileAvatar = answer['profile']['avatarfull']
-            profile_Avatar = requests.get(url=f"{answerProfileAvatar}")
-            #Сохраняем аватарку или перезаписываем
-            with open(f'images/{profile_id}/avatar.jpg', 'wb') as f: 
-                f.write(profile_Avatar.content)
-
-            return {'personaname': answer['profile']['personaname'],'name': answer['profile']['name'],'avatar_src': f'images/{profile_id}/avatar.jpg'}
+            if(answerProfileAvatar != None):
+                profile_Avatar = requests.get(url=f"{answerProfileAvatar}")
+                #Сохраняем аватарку или перезаписываем
+                with open(f'images/{profile_id}/avatar.jpg', 'wb') as f: 
+                    f.write(profile_Avatar.content)
+            
+                return {'personaname': answer['profile']['personaname'],'name': answer['profile']['name'],'avatar_src': f'images/{profile_id}/avatar.jpg'}
+            return {'personaname': answer['profile']['personaname'],'name': answer['profile']['name'],'avatar_src': None}
         except:
             print("[get_profile()] Неправильный profile_id или другая ошибка!")
             return None
