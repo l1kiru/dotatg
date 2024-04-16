@@ -8,7 +8,7 @@ from database import Match, PlayerInMatch, SteamProfile, Database
 from json_parser import parse_replay
 
 def main():
-    match_id = '7485861136'
+    match_id = '7679656977'
 
     match_full_processing([f'{match_id}'])
 
@@ -35,7 +35,8 @@ def match_full_processing(matches_arr):
             #Достаем id всех участников матча
             for player in answer['players']:
                 #Получаем данные профиля
-                if(player['account_id']!= None):  
+                #print(dict.keys(player))
+                if(player['account_id']!= None):
                     plr = get_profile(player['account_id'])
                     steam_profile_ = SteamProfile(
                     account_id=player['account_id'],personaname=plr['personaname'],
@@ -45,7 +46,7 @@ def match_full_processing(matches_arr):
                     account_data_tuples_arr.append(steam_profile_.get_data_tuple())
                 account_names = get_profile_names(player)
                 player_in_match_ = PlayerInMatch(
-                    match_id=player['match_id'],account_id=account_names['account_id'],
+                    match_id=match,account_id=account_names['account_id'],
                     rank_tier=player['rank_tier'],isRadiant=player['isRadiant'],
                     player_slot=player['player_slot'],party_id=player['party_id'],
                     party_size=player['party_size'],personaname=account_names['personaname'],
@@ -122,7 +123,7 @@ def get_additional_units(hero_id):
 def get_profile_names(player):
     if(player['account_id']!= None):
         return player
-    else: return {'account_id': "Unknown",'personaname': "Anonymous",'name':"Anonymous"}
+    else: return {'account_id': "Unknown",'personaname': "Anonymous",'name': None}
 
 #Возвращает имя в стиме и аватар
 def get_profile(profile_id):
