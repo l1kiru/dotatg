@@ -148,10 +148,10 @@ def parse_replay_interval(line,counter,chname_slot,movement,lhts,networth):
     unit_str = line['unit'].lower().replace('_','')[13:]
     if(unit_str not in chname_slot):
         chname_slot[unit_str] = line['slot']
-    movement[line['slot']][counter] = {'x' : {line['x']}, 'y' : {line['y']}}
+    movement[line['slot']][counter] = {'x' : line['x'], 'y' : line['y']}
     if(line['time'] % 60 == 0):
-        lhts[line['slot']][counter] = {'lh' : {line['lh']}}
-        networth[line['slot']][counter] = {'networth' : {line['networth']}}
+        lhts[line['slot']][counter] = {'lh' : line['lh']}
+        networth[line['slot']][counter] = {'networth' : line['networth']}
     return {'chname_slot':chname_slot,'movement':movement,'lhts':lhts,'networth':networth}
 
 def parse_replay_death_log(who,line,kills_log,combatlogd_slot):
