@@ -102,4 +102,4 @@ class TelegramUserORM(Base):
     chat_id: Mapped[int] = mapped_column(BigInteger,primary_key=True)
     account_id: Mapped[int | None] = mapped_column(BigInteger,nullable=True)
 
-create_tables()
+#create_tables()

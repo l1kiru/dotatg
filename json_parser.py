@@ -2,25 +2,24 @@ import os
 import bz2
 import json
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+op_api_key= os.getenv('OPENDOTAAPIKEY')
 
 def parse_replay(match_id):
-    #opendota ?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a
-    requests.post(url=f"https://api.opendota.com/api/request/{match_id}?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a")
-    req = requests.get(url=f"https://api.opendota.com/api/matches/{match_id}?api_key=7a659faa-0957-46c5-be5d-91cede0c2f5a").json()
-    print("parser 1")
+    requests.post(url=f"https://api.opendota.com/api/request/{match_id}?api_key={op_api_key}")
+    req = requests.get(url=f"https://api.opendota.com/api/matches/{match_id}?api_key={op_api_key}").json()
     replay_link = f"http://replay{req['cluster']}.valve.net/570/{match_id}_{req['replay_salt']}.dem.bz2" if (req.get('replay_salt')) else ''
     if(replay_link and not requests.get(replay_link).status_code == 404):
         req = requests.get(replay_link)
         with open(f"match{match_id}-replay.dem.bz2", 'wb') as f: 
             f.write(req.content)
-        print("parser 2")
         with open(f"match{match_id}-replay.dem", 'wb') as output_file, bz2.BZ2File(f'match{match_id}-replay.dem.bz2', 'rb') as input_file:
-            output_file.write(input_file.read())
-        print("parser 3")    
+            output_file.write(input_file.read()) 
         os.remove(f'match{match_id}-replay.dem.bz2')
-        os.system(f'curl 127.0.0.1:5600 --data-binary "@match{match_id}-replay.dem" > replays/{match_id}.jsonlinesines')
+        os.system(f'curl 127.0.0.1:5600 --data-binary "@match{match_id}-replay.dem" > {match_id}.jsonlinesines')
         os.remove(f"match{match_id}-replay.dem")
-        print("parser 4")
 
         chname_slot = {}
         movement = [{},{},{},{},{},{},{},{},{},{}]
@@ -30,7 +29,7 @@ def parse_replay(match_id):
         purchase_log = [{},{},{},{},{},{},{},{},{},{}]
         combatlogd_slot = {}
         kills_log = [{},{},{},{},{},{},{},{},{},{}]
-        with open(f"replays/{match_id}.jsonlinesines") as file_:
+        with open(f"{match_id}.jsonlinesines") as file_:
             counter = 0
             for line in file_.buffer:
                 line_ =  json.loads(line.decode('utf-8'))
@@ -139,7 +138,7 @@ def parse_replay(match_id):
                                 kills_log = parse_replay_death_log(who=combatlogd_slot[attackname],line=line_,kills_log=kills_log,combatlogd_slot=combatlogd_slot)
                             case 9:
                                 kills_log = parse_replay_death_log(who=combatlogd_slot[attackname],line=line_,kills_log=kills_log,combatlogd_slot=combatlogd_slot)
-
+        os.remove(f"{match_id}.jsonlinesines")
         return parse_replay_get_result(chname_slot=chname_slot,movement=movement,lhts=lhts,networth=networth,
                             combatlogp_slot=combatlogp_slot,purchase_log= purchase_log,
                             combatlogd_slot=combatlogd_slot,kills_log=kills_log)

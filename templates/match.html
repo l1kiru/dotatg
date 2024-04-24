@@ -1,10 +1,308 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Матч №
+Обзор матча: {{match.id}}
 {% endblock %}
 
 
 {% block body %}
-<h1> Body </h1>
+{% if match != None %}
+
+<div class="container row mx-auto">
+    <div class="col-4 victory-text 
+    {% if match.radiant_win %}victory-text-radiant{% else %}victory-text-dire{% endif %}"
+    >Победа сил {% if match.radiant_win %}Cвета{% else %}Тьмы{% endif %}</div>
+    <div class="col-4 row">
+        <div class="col-3 score-text">{{match.dire_score}}</div>
+        <div class="col-6 row">
+            <span class="col-12 center-text">{{match.game_mode | get_game_mode}}</span>
+
+            {% set duration_str = match.duration.strftime('%H:%M:%S') %}
+            {% if duration_str.startswith('00:') %}
+            <span class="col-12 center-text">{{ duration_str[3:] }}</span>
+            {% elif duration_str.startswith('0') %}
+            <span class="col-12 center-text">{{ duration_str[1:] }}</span>
+            {% else %}
+            <span class="col-12 center-text">{{ duration_str }}</span>
+            {% endif %}
+
+            <span class="col-12 center-text">Завершён {{ match.start_time | timestamp_to_days }} дней назад</span>
+
+        </div>
+        <div class="col-3 score-text">{{match.radiant_score}}</div>
+    </div>
+    <div class="col-4 row ">
+        <div class="col-6 row">
+            <span class="col-12 center-text">Номер матча:</span>
+            <span class="col-12 center-text">{{match.id}}</span>
+        </div>
+        <div class="col-6 row">
+            <span class="col-12 center-text">Регион:</span>
+            <span class="col-12 center-text">{{match.region | get_region}}</span>
+        </div>
+    </div>
+</div>
+
+<div class="container table-responsive">
+    <span class="table-title">Силы Света - Обзор</span>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Игрок</th>
+                <th scope="col">Ур.</th>
+                <th scope="col" class="kills-th">У</th>
+                <th scope="col" class="deaths-th">С</th>
+                <th scope="col">П</th>
+                <th scope="col">ДК/НО</th>
+                <th scope="col" class="networth-th">Цен</th>
+                <th scope="col">З/М</th>
+                <th scope="col">О/М</th>
+                <th scope="col">Урон</th>
+                <th scope="col">ПСТР</th>
+                <th scope="col">Леч</th>
+                <th scope="col">Предметы</th>
+                <th scope="col">НП</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in match.players[:5] %}
+            <tr>
+                <td class="party-td">{{player.party_id}}</td>
+                <td class="player-td">
+                    <div>
+                        <img class="hero_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_lg.png"
+                            alt="{{player.hero_id | get_heroes}}">
+                        <span>{{player.personaname}}</span>
+                    </div>
+                </td>
+                <td>{{player.mp_lvlup.level}}</td>
+                <td class="kills-td">{{player.mp_kda.kills}}</td>
+                <td class="deaths-td">{{player.mp_kda.deaths}}</td>
+                <td>{{player.mp_kda.assists}}</td>
+                <td>{{player.mp_kda.last_hits}}/{{player.mp_kda.denies}}</td>
+                <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
+                <td>{{player.mp_networth.gold_per_min}}</td>
+                <td>{{player.mp_lvlup.xp_per_min}}</td>
+                <td>{{player.hero_damage}}</td>
+                <td>{{player.tower_damage}}</td>
+                <td>{{player.hero_healing}}</td>
+                <td>
+                    <div>
+                        {% for item in player.inventory[:6] %}
+                        {% if item | get_item != 'ability_base' %}
+                        <img class="item_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            alt="{{ item | get_item }}">
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {% for item in player.inventory[7:] %}
+                        {% if item | get_item != 'ability_base' %}
+                        <img class="item_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            alt="{{ item | get_item }}">
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <img class="item_icon"
+                        src="http://cdn.dota2.com/apps/dota2/images/items/{{ player.inventory[6] | get_item }}_lg.png"
+                        alt="{{ player.inventory[6] | get_item }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container table-responsive">
+    <span class="table-title">Силы Тьмы - Обзор</span>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Игрок</th>
+                <th scope="col">Ур.</th>
+                <th scope="col" class="kills-th">У</th>
+                <th scope="col" class="deaths-th">С</th>
+                <th scope="col">П</th>
+                <th scope="col">ДК/НО</th>
+                <th scope="col" class="networth-th">Цен</th>
+                <th scope="col">З/М</th>
+                <th scope="col">О/М</th>
+                <th scope="col">Урон</th>
+                <th scope="col">ПСТР</th>
+                <th scope="col">Леч</th>
+                <th scope="col">Предметы</th>
+                <th scope="col">НП</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in match.players[5:] %}
+            <tr>
+                <td class="party-td">{{player.party_id}}</td>
+                <td class="player-td">
+                    <div>
+                        <img class="hero_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_sb.png"
+                            alt="{{player.hero_id | get_heroes}}">
+                        <span>{{player.personaname}}</span>
+                    </div>
+                </td>
+                <td>{{player.mp_lvlup.level}}</td>
+                <td class="kills-td">{{player.mp_kda.kills}}</td>
+                <td class="deaths-td">{{player.mp_kda.deaths}}</td>
+                <td>{{player.mp_kda.assists}}</td>
+                <td>{{player.mp_kda.last_hits}}/{{player.mp_kda.denies}}</td>
+                <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
+                <td>{{player.mp_networth.gold_per_min}}</td>
+                <td>{{player.mp_lvlup.xp_per_min}}</td>
+                <td>{{player.hero_damage}}</td>
+                <td>{{player.tower_damage}}</td>
+                <td>{{player.hero_healing}}</td>
+                <td>
+                    <div>
+                        {% for item in player.inventory[:6] %}
+                        {% if item | get_item != 'ability_base' %}
+                        <img class="item_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            alt="{{ item | get_item }}">
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {% for item in player.inventory[7:] %}
+                        {% if item | get_item != 'ability_base' %}
+                        <img class="item_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            alt="{{ item | get_item }}">
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <img class="item_icon"
+                        src="http://cdn.dota2.com/apps/dota2/images/items/{{ player.inventory[6] | get_item }}_lg.png"
+                        alt="{{ player.inventory[6] | get_item }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container table-responsive">
+    <span class="table-title">Силы Света - Порядок изучения способностей</span>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Игрок</th>
+                {% for i in range(25) %}
+                <th scope="col"></th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in match.players[0:5] %}
+            <tr>
+                <td class="player-td">
+                    <div>
+                        <img class="hero_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_lg.png"
+                            alt="{{player.hero_id | get_heroes}}">
+                        <span>{{player.personaname}}</span>
+                    </div>
+                </td data-value="{{ ability_name | get_ability_value}}">
+                {% for ability in player.mp_lvlup.ability_upgrades_arr %}
+                {% set ability_name = ability | get_ability %}
+                {% if 'special_bonus' not in ability_name %}
+                <td>
+                    <img class="ability_icon"
+                        src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/{{ ability_name }}.png"
+                        alt="{{ ability_name }}">
+                </td>
+                {% endif %}
+                {% if 'special_bonus' in ability_name %}
+                <td data-value="{{ ability_name | get_ability_value}}">
+                    <img class="ability_icon" src="/static/images/talent.jpg" alt="{{ ability_name }}">
+                </td>
+                {% endif %}
+                {% endfor %}
+
+                {% set remaining_slots = 25 - player.mp_lvlup.ability_upgrades_arr|length %}
+                {% if remaining_slots > 0 %}
+                {% for i in range(remaining_slots) %}
+                <td></td>
+                {% endfor %}
+                {% endif %}
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container table-responsive">
+    <span class="table-title">Силы Тьмы - Порядок изучения способностей</span>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Игрок</th>
+                {% for i in range(25) %}
+                <th scope="col"></th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in match.players[5:] %}
+            <tr>
+                <td class="player-td">
+                    <div>
+                        <img class="hero_icon"
+                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_sb.png"
+                            alt="{{player.hero_id | get_heroes}}">
+                        <span>{{player.personaname}}</span>
+                    </div>
+                </td>
+                {% for ability in player.mp_lvlup.ability_upgrades_arr %}
+                {% set ability_name = ability | get_ability %}
+                {% if 'special_bonus' not in ability_name %}
+                <td>
+                    <img class="ability_icon"
+                        src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/{{ ability_name }}.png"
+                        alt="{{ ability_name }}">
+                </td>
+                {% endif %}
+                {% if 'special_bonus' in ability_name %}
+                <td data-value="{{ ability_name | get_ability_value}}">
+                    <img class="ability_icon" src="/static/images/talent.jpg" alt="{{ ability_name }}">
+                </td>
+                {% endif %}
+                {% endfor %}
+
+                {% set remaining_slots = 25 - player.mp_lvlup.ability_upgrades_arr|length %}
+                {% if remaining_slots > 0 %}
+                {% for i in range(remaining_slots) %}
+                <td></td>
+                {% endfor %}
+                {% endif %}
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% if match == None %}
+<div class="container mx-auto notfound">
+    <h1>Матч не найден</h1>
+</div>
+{% endif %}
+
 {% endblock %}

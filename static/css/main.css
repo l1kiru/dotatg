@@ -1,0 +1,97 @@
+body{
+    background-color: #152032 !important;
+    color: white !important;
+}
+
+.container{
+    padding-top: 2rem;
+    margin-top: -1rem;
+}
+
+.victory-text{
+    font-size: 2rem;
+    text-align: center;
+}
+.victory-text-radiant{
+    color: #67E667;
+}
+.victory-text-dire{
+    color: #FD3F49;
+}
+.score-text{
+    font-size: 2rem;
+    text-align: center;
+}
+.center-text{
+    text-align: center;
+}
+
+tr{
+    background: linear-gradient(#29576f, #14273b) !important;
+    color: white !important;
+}
+th{
+    background: linear-gradient(#29576f, #14273b) !important;
+    color: white !important;
+}
+td{
+    background-color: #152032 !important;
+    color: white !important;
+}
+
+.table{
+    background-color: #152032 !important;
+    color: white !important;
+}
+
+
+.ability_icon{
+    width: 2rem;
+    height: 2rem;
+}
+.hero_icon{
+    width: 4rem;
+    height: 2rem;
+}
+.item_icon{
+    width: 3.25rem;
+    height: 1.75rem;
+}
+
+.player-td{
+    width: 15rem;
+}
+.party-td{
+    width: 0.5rem !important;
+}
+
+.kills-td{
+    color:#67E667 !important;
+}
+.kills-th{
+    color:#67E667 !important;
+}
+
+.deaths-td{
+    color:#FD3F49 !important;
+}
+.deaths-th{
+    color:#FD3F49 !important;
+}
+
+.networth-td{
+    color:#FFAD40 !important;
+}
+.networth-th{
+    color:#FFAD40 !important;
+}
+
+.table-title{
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.notfound{
+    margin-top: 30vh;
+    text-align: center;
+}

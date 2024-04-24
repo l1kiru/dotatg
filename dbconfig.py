@@ -1,8 +1,12 @@
-host = "127.0.0.1"
-user = "postgres"
-password = "admin"
-db_name = "dotabase"
-port = 5432 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+host = os.getenv('HOST')
+user = os.getenv('USER')
+password = os.getenv('PASSWORD')
+db_name = os.getenv('DB_NAME')
+port = os.getenv('PORT')
 
 class DBsettings():
     def __init__(self,host,user,password,db_name,port):
