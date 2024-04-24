@@ -37,7 +37,7 @@ async def start(message: Message):
         test = await message.reply("Обрабатываю.")
         answer = await match_full_processing_async(match_id)
         markup = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text='Показать.',web_app=WebAppInfo(url='https://ya.ru'))]
+            [types.InlineKeyboardButton(text='Показать.',web_app=WebAppInfo(url='https://194.87.102.177:3000/match/match_id'))]
         ])
         await test.edit_text(answer,reply_markup=markup)
     elif("мой id" in message.text.lower()):
