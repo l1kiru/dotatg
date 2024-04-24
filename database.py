@@ -1,5 +1,5 @@
-from dbconfig import host, user, password, db_name, port
-from dbconfig import DBsettings
+from config import host, user, password, db_name, port
+from config import DBsettings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 

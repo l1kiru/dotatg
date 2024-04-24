@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 host = os.getenv('HOST')
-user = os.getenv('USER')
+user = "postgres"
 password = os.getenv('PASSWORD')
 db_name = os.getenv('DB_NAME')
 port = os.getenv('PORT')

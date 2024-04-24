@@ -6,7 +6,7 @@ from app.handlers import router
 from dotenv import load_dotenv
 
 load_dotenv()
-token= os.getenv('BOTTOKEN')
+token = os.getenv('BOTTOKEN')
 
 bot = Bot(token)
 dp = Dispatcher()
