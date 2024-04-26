@@ -5,6 +5,7 @@
 *.dem
 *.bz2
 replays/
-images/
+/images/*
+!static/images/
 .venv/
 .env

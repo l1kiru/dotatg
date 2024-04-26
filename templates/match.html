@@ -14,7 +14,7 @@
     >Победа сил {% if match.radiant_win %}Cвета{% else %}Тьмы{% endif %}</div>
     <div class="col-12 col-md-8 row mx-auto">
         <div class="col-12 col-md-6 row mx-auto">
-            <div class="col-2 col-md-2 score-text">{{match.dire_score}}</div>
+            <div class="col-2 col-md-2 score-text victory-text-radiant">{{match.radiant_score}}</div>
             <div class="col-8 col-md-8 row">
                 <span class="col-md-12 center-text">{{match.game_mode | get_game_mode}}</span>
     
@@ -30,7 +30,7 @@
                 <span class="col-md-12 center-text">Завершён {{ match.start_time | timestamp_to_days }} дней назад</span>
     
             </div>
-            <div class="col-2 col-md-2 score-text">{{match.radiant_score}}</div>
+            <div class="col-2 col-md-2 score-text victory-text-dire">{{match.dire_score}}</div>
         </div>
         <div class="col-12 col-md-6 row mx-auto">
             <div class="col-md-6 row">
@@ -72,7 +72,7 @@
                 <td class="player-td">
                     <div>
                         <img class="hero_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_lg.png"
+                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
                             alt="{{player.hero_id | get_heroes}}">
                         <span>{{player.personaname}}</span>
                     </div>
@@ -93,7 +93,7 @@
                         {% for item in player.inventory[:6] %}
                         {% if item | get_item != 'ability_base' %}
                         <img class="item_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            src="/static/images/items/{{ item | get_item }}.png"
                             alt="{{ item | get_item }}">
                         {% endif %}
                         {% endfor %}
@@ -102,7 +102,7 @@
                         {% for item in player.inventory[7:] %}
                         {% if item | get_item != 'ability_base' %}
                         <img class="item_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            src="/static/images/items/{{ item | get_item }}.png"
                             alt="{{ item | get_item }}">
                         {% endif %}
                         {% endfor %}
@@ -110,7 +110,7 @@
                 </td>
                 <td>
                     <img class="item_icon"
-                        src="http://cdn.dota2.com/apps/dota2/images/items/{{ player.inventory[6] | get_item }}_lg.png"
+                        src="/static/images/items/{{ player.inventory[6] | get_item }}.png"
                         alt="{{ player.inventory[6] | get_item }}">
                 </td>
             </tr>
@@ -148,7 +148,7 @@
                 <td class="player-td">
                     <div>
                         <img class="hero_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_sb.png"
+                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
                             alt="{{player.hero_id | get_heroes}}">
                         <span>{{player.personaname}}</span>
                     </div>
@@ -169,7 +169,7 @@
                         {% for item in player.inventory[:6] %}
                         {% if item | get_item != 'ability_base' %}
                         <img class="item_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            src="/static/images/items/{{ item | get_item }}.png"
                             alt="{{ item | get_item }}">
                         {% endif %}
                         {% endfor %}
@@ -178,7 +178,7 @@
                         {% for item in player.inventory[7:] %}
                         {% if item | get_item != 'ability_base' %}
                         <img class="item_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/items/{{ item | get_item }}_lg.png"
+                            src="/static/images/items/{{ item | get_item }}.png"
                             alt="{{ item | get_item }}">
                         {% endif %}
                         {% endfor %}
@@ -186,7 +186,7 @@
                 </td>
                 <td>
                     <img class="item_icon"
-                        src="http://cdn.dota2.com/apps/dota2/images/items/{{ player.inventory[6] | get_item }}_lg.png"
+                        src="/static/images/items/{{ player.inventory[6] | get_item }}.png"
                         alt="{{ player.inventory[6] | get_item }}">
                 </td>
             </tr>
@@ -212,7 +212,7 @@
                 <td class="player-td">
                     <div>
                         <img class="hero_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_lg.png"
+                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
                             alt="{{player.hero_id | get_heroes}}">
                         <span>{{player.personaname}}</span>
                     </div>
@@ -222,13 +222,13 @@
                 {% if 'special_bonus' not in ability_name %}
                 <td>
                     <img class="ability_icon"
-                        src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/{{ ability_name }}.png"
+                        src="/static/images/abilities/{{ ability_name }}.png"
                         alt="{{ ability_name }}">
                 </td>
                 {% endif %}
                 {% if 'special_bonus' in ability_name %}
                 <td data-value="{{ ability_name | get_ability_value}}">
-                    <img class="ability_icon" src="/static/images/talent.jpg" alt="{{ ability_name }}">
+                    <img class="ability_icon" src="/static/images/abilities/talent.jpg" alt="{{ ability_name }}">
                 </td>
                 {% endif %}
                 {% endfor %}
@@ -264,7 +264,7 @@
                 <td class="player-td">
                     <div>
                         <img class="hero_icon"
-                            src="http://cdn.dota2.com/apps/dota2/images/heroes/{{ player.hero_id | get_heroes }}_sb.png"
+                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
                             alt="{{player.hero_id | get_heroes}}">
                         <span>{{player.personaname}}</span>
                     </div>
@@ -274,13 +274,13 @@
                 {% if 'special_bonus' not in ability_name %}
                 <td>
                     <img class="ability_icon"
-                        src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/{{ ability_name }}.png"
+                        src="/static/images/abilities/{{ ability_name }}.png"
                         alt="{{ ability_name }}">
                 </td>
                 {% endif %}
                 {% if 'special_bonus' in ability_name %}
                 <td data-value="{{ ability_name | get_ability_value}}">
-                    <img class="ability_icon" src="/static/images/talent.jpg" alt="{{ ability_name }}">
+                    <img class="ability_icon" src="/static/images/abilities/talent.jpg" alt="{{ ability_name }}">
                 </td>
                 {% endif %}
                 {% endfor %}
