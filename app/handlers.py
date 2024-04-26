@@ -21,10 +21,17 @@ async def start(message: Message):
 
 @router.message(Command('commands','Commands'))
 async def start(message: Message):
+    commands = []
+    res = ''
     first = '1: "Матч + {id матча}" - запрос обработать матч.'
-    second = '2: "Последние матчи" - запрос обработать последние 25 матчей.'
+    commands.append(first)
+    #second = '2: "Последние матчи" - запрос обработать последние 25 матчей.'
+    #commands.append(second)
     third = '3: "Мой id + {id профиля в доте}" - запрос на установку id'
-    await message.answer(f"""{first}\n{second}\n{third}""")
+    commands.append(third)
+    for comm in commands:
+        res += f'{comm}\n'
+    await message.answer(res)
 
 @router.message(F.text)
 async def start(message: Message):
@@ -36,10 +43,13 @@ async def start(message: Message):
         match_id = findMatchId(message.text.split())
         test = await message.reply("Обрабатываю.")
         answer = await match_full_processing_async(match_id)
-        markup = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text='Показать.',web_app=WebAppInfo(url='https://194.87.102.177:3000/match/match_id'))]
-        ])
-        await test.edit_text(answer,reply_markup=markup)
+        if('Неправильный id матча' not in answer):
+            markup = types.InlineKeyboardMarkup(inline_keyboard=[
+                [types.InlineKeyboardButton(text='Показать.',web_app=WebAppInfo(url=f'https://d2stats.ru/match/{match_id}'))]
+            ])
+            await test.edit_text(answer,reply_markup=markup)
+        else:
+            await test.edit_text(answer)
     elif("мой id" in message.text.lower()):
         newUser(message.chat.id)
         account_id = findMatchId(message.text.split())
