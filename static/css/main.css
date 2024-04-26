@@ -21,9 +21,13 @@ body{
 .score-text{
     font-size: 2rem;
     text-align: center;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 .center-text{
     text-align: center;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 tr{
@@ -37,13 +41,13 @@ th{
 td{
     background-color: #152032 !important;
     color: white !important;
+    white-space: nowrap;
 }
 
 .table{
     background-color: #152032 !important;
     color: white !important;
 }
-
 
 .ability_icon{
     width: 2rem;
@@ -56,13 +60,6 @@ td{
 .item_icon{
     width: 3.25rem;
     height: 1.75rem;
-}
-
-.player-td{
-    width: 15rem;
-}
-.party-td{
-    width: 0.5rem !important;
 }
 
 .kills-td{

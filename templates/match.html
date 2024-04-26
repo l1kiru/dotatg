@@ -9,36 +9,36 @@
 {% if match != None %}
 
 <div class="container row mx-auto">
-    <div class="col-4 victory-text 
+    <div class="col-12 col-md-4 victory-text 
     {% if match.radiant_win %}victory-text-radiant{% else %}victory-text-dire{% endif %}"
     >Победа сил {% if match.radiant_win %}Cвета{% else %}Тьмы{% endif %}</div>
-    <div class="col-4 row">
-        <div class="col-3 score-text">{{match.dire_score}}</div>
-        <div class="col-6 row">
-            <span class="col-12 center-text">{{match.game_mode | get_game_mode}}</span>
-
-            {% set duration_str = match.duration.strftime('%H:%M:%S') %}
-            {% if duration_str.startswith('00:') %}
-            <span class="col-12 center-text">{{ duration_str[3:] }}</span>
-            {% elif duration_str.startswith('0') %}
-            <span class="col-12 center-text">{{ duration_str[1:] }}</span>
-            {% else %}
-            <span class="col-12 center-text">{{ duration_str }}</span>
-            {% endif %}
-
-            <span class="col-12 center-text">Завершён {{ match.start_time | timestamp_to_days }} дней назад</span>
-
+    <div class="col-12 col-md-8 row mx-auto">
+        <div class="col-12 col-md-6 row mx-auto">
+            <div class="col-2 col-md-2 score-text">{{match.dire_score}}</div>
+            <div class="col-8 col-md-8 row">
+                <span class="col-md-12 center-text">{{match.game_mode | get_game_mode}}</span>
+    
+                {% set duration_str = match.duration.strftime('%H:%M:%S') %}
+                {% if duration_str.startswith('00:') %}
+                <span class="col-md-12 center-text">{{ duration_str[3:] }}</span>
+                {% elif duration_str.startswith('0') %}
+                <span class="col-md-12 center-text">{{ duration_str[1:] }}</span>
+                {% else %}
+                <span class="col-md-12 center-text">{{ duration_str }}</span>
+                {% endif %}
+    
+                <span class="col-md-12 center-text">Завершён {{ match.start_time | timestamp_to_days }} дней назад</span>
+    
+            </div>
+            <div class="col-2 col-md-2 score-text">{{match.radiant_score}}</div>
         </div>
-        <div class="col-3 score-text">{{match.radiant_score}}</div>
-    </div>
-    <div class="col-4 row ">
-        <div class="col-6 row">
-            <span class="col-12 center-text">Номер матча:</span>
-            <span class="col-12 center-text">{{match.id}}</span>
-        </div>
-        <div class="col-6 row">
-            <span class="col-12 center-text">Регион:</span>
-            <span class="col-12 center-text">{{match.region | get_region}}</span>
+        <div class="col-12 col-md-6 row mx-auto">
+            <div class="col-md-6 row">
+                <span class="col-12 center-text">Номер матча: {{match.id}}</span>
+            </div>
+            <div class="col-md-6 row">
+                <span class="col-12 center-text">Регион: {{match.region | get_region}}</span>
+            </div>
         </div>
     </div>
 </div>
@@ -77,7 +77,7 @@
                         <span>{{player.personaname}}</span>
                     </div>
                 </td>
-                <td>{{player.mp_lvlup.level}}</td>
+                <td>|{{player.mp_lvlup.level}}|</td>
                 <td class="kills-td">{{player.mp_kda.kills}}</td>
                 <td class="deaths-td">{{player.mp_kda.deaths}}</td>
                 <td>{{player.mp_kda.assists}}</td>
