@@ -8,296 +8,406 @@
 {% block body %}
 {% if match != None %}
 
-<div class="container row mx-auto">
-    <div class="col-12 col-md-4 victory-text 
-    {% if match.radiant_win %}victory-text-radiant{% else %}victory-text-dire{% endif %}"
-    >Победа сил {% if match.radiant_win %}Cвета{% else %}Тьмы{% endif %}</div>
-    <div class="col-12 col-md-8 row mx-auto">
-        <div class="col-12 col-md-6 row mx-auto">
-            <div class="col-2 col-md-2 score-text victory-text-radiant">{{match.radiant_score}}</div>
-            <div class="col-8 col-md-8 row">
-                <span class="col-md-12 center-text">{{match.game_mode | get_game_mode}}</span>
-    
-                {% set duration_str = match.duration.strftime('%H:%M:%S') %}
-                {% if duration_str.startswith('00:') %}
-                <span class="col-md-12 center-text">{{ duration_str[3:] }}</span>
-                {% elif duration_str.startswith('0') %}
-                <span class="col-md-12 center-text">{{ duration_str[1:] }}</span>
-                {% else %}
-                <span class="col-md-12 center-text">{{ duration_str }}</span>
-                {% endif %}
-    
-                <span class="col-md-12 center-text">Завершён {{ match.start_time | timestamp_to_days }} дней назад</span>
-    
+<nav class="py-2 border-bottom">
+    <div class="container row mx-auto">
+        <div class="col-12 col-md-4 victory-text 
+        {% if match.radiant_win %}victory-text-radiant{% else %}victory-text-dire{% endif %}">Победа сил {% if
+            match.radiant_win %}Cвета{% else %}Тьмы{% endif %}</div>
+        <div class="col-12 col-md-8 row mx-auto">
+            <div class="col-12 col-md-6 row mx-auto">
+                <div class="col-2 col-md-2 score-text victory-text-radiant">{{match.radiant_score}}</div>
+                <div class="col-8 col-md-8 row">
+                    <span class="col-md-12 center-text">{{match.game_mode | get_game_mode}}</span>
+
+                    {% set duration_str = match.duration.strftime('%H:%M:%S') %}
+                    {% if duration_str.startswith('00:') %}
+                    <span class="col-md-12 center-text">{{ duration_str[3:] }}</span>
+                    {% elif duration_str.startswith('0') %}
+                    <span class="col-md-12 center-text">{{ duration_str[1:] }}</span>
+                    {% else %}
+                    <span class="col-md-12 center-text">{{ duration_str }}</span>
+                    {% endif %}
+
+                    <span class="col-md-12 center-text">Завершён {{ match.start_time | timestamp_to_days }} дней
+                        назад</span>
+
+                </div>
+                <div class="col-2 col-md-2 score-text victory-text-dire">{{match.dire_score}}</div>
             </div>
-            <div class="col-2 col-md-2 score-text victory-text-dire">{{match.dire_score}}</div>
-        </div>
-        <div class="col-12 col-md-6 row mx-auto">
-            <div class="col-md-6 row">
-                <span class="col-12 center-text">Номер матча: {{match.id}}</span>
-            </div>
-            <div class="col-md-6 row">
-                <span class="col-12 center-text">Регион: {{match.region | get_region}}</span>
+            <div class="col-12 col-md-6 row mx-auto">
+                <div class="col-md-6 row">
+                    <span class="col-12 center-text">Номер матча: {{match.id}}</span>
+                </div>
+                <div class="col-md-6 row">
+                    <span class="col-12 center-text">Регион: {{match.region | get_region}}</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</nav>
 
-<div class="container table-responsive">
-    <span class="table-title">Силы Света - Обзор</span>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Игрок</th>
-                <th scope="col">Ур.</th>
-                <th scope="col" class="kills-th">У</th>
-                <th scope="col" class="deaths-th">С</th>
-                <th scope="col">П</th>
-                <th scope="col">ДК/НО</th>
-                <th scope="col" class="networth-th">Цен</th>
-                <th scope="col">З/М</th>
-                <th scope="col">О/М</th>
-                <th scope="col">Урон</th>
-                <th scope="col">ПСТР</th>
-                <th scope="col">Леч</th>
-                <th scope="col">Предметы</th>
-                <th scope="col">НП</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in match.players[:5] %}
-            <tr>
-                <td class="party-td">{{player.party_id}}</td>
-                <td class="player-td">
-                    <div>
-                        <img class="hero_icon"
-                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                            alt="{{player.hero_id | get_heroes}}">
-                        <span>{{player.personaname}}</span>
-                    </div>
-                </td>
-                <td>|{{player.mp_lvlup.level}}|</td>
-                <td class="kills-td">{{player.mp_kda.kills}}</td>
-                <td class="deaths-td">{{player.mp_kda.deaths}}</td>
-                <td>{{player.mp_kda.assists}}</td>
-                <td>{{player.mp_kda.last_hits}}/{{player.mp_kda.denies}}</td>
-                <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
-                <td>{{player.mp_networth.gold_per_min}}</td>
-                <td>{{player.mp_lvlup.xp_per_min}}</td>
-                <td>{{player.hero_damage}}</td>
-                <td>{{player.tower_damage}}</td>
-                <td>{{player.hero_healing}}</td>
-                <td>
-                    <div>
-                        {% for item in player.inventory[:6] %}
-                        {% if item | get_item != 'ability_base' %}
-                        <img class="item_icon"
-                            src="/static/images/items/{{ item | get_item }}.png"
-                            alt="{{ item | get_item }}">
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button"
+            role="tab" aria-controls="main" aria-selected="true">Обзор</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link 
+        {% if not match.players[0].movement_by_time %} disabled {% endif %}" id="items-tab" data-bs-toggle="tab"
+            data-bs-target="#items" type="button" role="tab" aria-controls="items"
+            aria-selected="false">Предметы</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link
+         disabled" id="graph-tab" data-bs-toggle="tab"
+            data-bs-target="#graph" type="button" role="tab" aria-controls="graph"
+            aria-selected="false">Графики</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
+        <span class="table-title">Силы Света - Обзор</span>
+        <div class="container table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Игрок</th>
+                        <th scope="col">Ур.</th>
+                        <th scope="col" class="kills-th">У</th>
+                        <th scope="col" class="deaths-th">С</th>
+                        <th scope="col">П</th>
+                        <th scope="col">ДК/НО</th>
+                        <th scope="col" class="networth-th">Цен</th>
+                        <th scope="col">З/М</th>
+                        <th scope="col">О/М</th>
+                        <th scope="col">Урон</th>
+                        <th scope="col">ПСТР</th>
+                        <th scope="col">Леч</th>
+                        <th scope="col">Предметы</th>
+                        <th scope="col">НП</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in match.players[5:] %}
+                    <tr>
+                        <td class="party-td">{{player.party_id}}</td>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon" src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                    alt="{{player.hero_id | get_heroes}}">
+                                <span>{{player.personaname}}</span>
+                            </div>
+                        </td>
+                        <td>|{{player.mp_lvlup.level}}|</td>
+                        <td class="kills-td">{{player.mp_kda.kills}}</td>
+                        <td class="deaths-td">{{player.mp_kda.deaths}}</td>
+                        <td>{{player.mp_kda.assists}}</td>
+                        <td>{{player.mp_kda.last_hits}}/{{player.mp_kda.denies}}</td>
+                        <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
+                        <td>{{player.mp_networth.gold_per_min}}</td>
+                        <td>{{player.mp_lvlup.xp_per_min}}</td>
+                        <td>{{player.hero_damage}}</td>
+                        <td>{{player.tower_damage}}</td>
+                        <td>{{player.hero_healing}}</td>
+                        <td>
+                            <div>
+                                {% for item in player.inventory[:6] %}
+                                {% if item | get_item != 'ability_base' %}
+                                <img class="item_icon" src="/static/images/items/{{ item | get_item }}.png"
+                                    alt="{{ item | get_item }}">
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div>
+                                {% for item in player.inventory[7:] %}
+                                {% if item | get_item != 'ability_base' %}
+                                <img class="item_icon" src="/static/images/items/{{ item | get_item }}.png"
+                                    alt="{{ item | get_item }}">
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <img class="item_icon" src="/static/images/items/{{ player.inventory[6] | get_item }}.png"
+                                alt="{{ player.inventory[6] | get_item }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <span class="table-title">Силы Тьмы - Обзор</span>
+        <div class="container table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Игрок</th>
+                        <th scope="col">Ур.</th>
+                        <th scope="col" class="kills-th">У</th>
+                        <th scope="col" class="deaths-th">С</th>
+                        <th scope="col">П</th>
+                        <th scope="col">ДК/НО</th>
+                        <th scope="col" class="networth-th">Цен</th>
+                        <th scope="col">З/М</th>
+                        <th scope="col">О/М</th>
+                        <th scope="col">Урон</th>
+                        <th scope="col">ПСТР</th>
+                        <th scope="col">Леч</th>
+                        <th scope="col">Предметы</th>
+                        <th scope="col">НП</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in match.players[:5] %}
+                    <tr>
+                        <td class="party-td">{{player.party_id}}</td>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon" src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                    alt="{{player.hero_id | get_heroes}}">
+                                <span>{{player.personaname}}</span>
+                            </div>
+                        </td>
+                        <td>{{player.mp_lvlup.level}}</td>
+                        <td class="kills-td">{{player.mp_kda.kills}}</td>
+                        <td class="deaths-td">{{player.mp_kda.deaths}}</td>
+                        <td>{{player.mp_kda.assists}}</td>
+                        <td>{{player.mp_kda.last_hits}}/{{player.mp_kda.denies}}</td>
+                        <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
+                        <td>{{player.mp_networth.gold_per_min}}</td>
+                        <td>{{player.mp_lvlup.xp_per_min}}</td>
+                        <td>{{player.hero_damage}}</td>
+                        <td>{{player.tower_damage}}</td>
+                        <td>{{player.hero_healing}}</td>
+                        <td>
+                            <div>
+                                {% for item in player.inventory[:6] %}
+                                {% if item | get_item != 'ability_base' %}
+                                <img class="item_icon" src="/static/images/items/{{ item | get_item }}.png"
+                                    alt="{{ item | get_item }}">
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div>
+                                {% for item in player.inventory[7:] %}
+                                {% if item | get_item != 'ability_base' %}
+                                <img class="item_icon" src="/static/images/items/{{ item | get_item }}.png"
+                                    alt="{{ item | get_item }}">
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <img class="item_icon" src="/static/images/items/{{ player.inventory[6] | get_item }}.png"
+                                alt="{{ player.inventory[6] | get_item }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <span class="table-title">Силы Света - Порядок изучения способностей</span>
+        {% if match.players[0].mp_lvlup.ability_upgrades_arr != None %}
+        <div class="container table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Игрок</th>
+                        {% for i in range(25) %}
+                        <th scope="col"></th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in match.players[5:] %}
+                    <tr>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon" src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                    alt="{{player.hero_id | get_heroes}}">
+                                <span>{{player.personaname}}</span>
+                            </div>
+                        </td data-value="{{ ability_name | get_ability_value}}">
+                        {% for ability in player.mp_lvlup.ability_upgrades_arr %}
+                        {% set ability_name = ability | get_ability %}
+                        {% if 'special_bonus' not in ability_name %}
+                        <td>
+                            <img class="ability_icon" src="/static/images/abilities/{{ ability_name }}.png"
+                                alt="{{ ability_name }}">
+                        </td>
+                        {% endif %}
+                        {% if 'special_bonus' in ability_name %}
+                        <td data-value="{{ ability_name | get_ability_value}}">
+                            <img class="ability_icon" src="/static/images/abilities/talent.jpg"
+                                alt="{{ ability_name }}">
+                        </td>
                         {% endif %}
                         {% endfor %}
-                    </div>
-                    <div>
-                        {% for item in player.inventory[7:] %}
-                        {% if item | get_item != 'ability_base' %}
-                        <img class="item_icon"
-                            src="/static/images/items/{{ item | get_item }}.png"
-                            alt="{{ item | get_item }}">
+
+                        {% set remaining_slots = 25 - player.mp_lvlup.ability_upgrades_arr|length %}
+                        {% if remaining_slots > 0 %}
+                        {% for i in range(remaining_slots) %}
+                        <td></td>
+                        {% endfor %}
+                        {% endif %}
+
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="container mx-auto nodata">
+            <h1>Данных нет</h1>
+        </div>
+        {% endif %}
+        <span class="table-title">Силы Тьмы - Порядок изучения способностей</span>
+        {% if match.players[0].mp_lvlup.ability_upgrades_arr != None %}
+        <div class="container table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Игрок</th>
+                        {% for i in range(25) %}
+                        <th scope="col"></th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in match.players[:5] %}
+                    <tr>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon" src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                    alt="{{player.hero_id | get_heroes}}">
+                                <span>{{player.personaname}}</span>
+                            </div>
+                        </td>
+                        {% for ability in player.mp_lvlup.ability_upgrades_arr %}
+                        {% set ability_name = ability | get_ability %}
+                        {% if 'special_bonus' not in ability_name %}
+                        <td>
+                            <img class="ability_icon" src="/static/images/abilities/{{ ability_name }}.png"
+                                alt="{{ ability_name }}">
+                        </td>
+                        {% endif %}
+                        {% if 'special_bonus' in ability_name %}
+                        <td data-value="{{ ability_name | get_ability_value}}">
+                            <img class="ability_icon" src="/static/images/abilities/talent.jpg"
+                                alt="{{ ability_name }}">
+                        </td>
                         {% endif %}
                         {% endfor %}
-                    </div>
-                </td>
-                <td>
-                    <img class="item_icon"
-                        src="/static/images/items/{{ player.inventory[6] | get_item }}.png"
-                        alt="{{ player.inventory[6] | get_item }}">
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-<div class="container table-responsive">
-    <span class="table-title">Силы Тьмы - Обзор</span>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Игрок</th>
-                <th scope="col">Ур.</th>
-                <th scope="col" class="kills-th">У</th>
-                <th scope="col" class="deaths-th">С</th>
-                <th scope="col">П</th>
-                <th scope="col">ДК/НО</th>
-                <th scope="col" class="networth-th">Цен</th>
-                <th scope="col">З/М</th>
-                <th scope="col">О/М</th>
-                <th scope="col">Урон</th>
-                <th scope="col">ПСТР</th>
-                <th scope="col">Леч</th>
-                <th scope="col">Предметы</th>
-                <th scope="col">НП</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in match.players[5:] %}
-            <tr>
-                <td class="party-td">{{player.party_id}}</td>
-                <td class="player-td">
-                    <div>
-                        <img class="hero_icon"
-                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                            alt="{{player.hero_id | get_heroes}}">
-                        <span>{{player.personaname}}</span>
-                    </div>
-                </td>
-                <td>{{player.mp_lvlup.level}}</td>
-                <td class="kills-td">{{player.mp_kda.kills}}</td>
-                <td class="deaths-td">{{player.mp_kda.deaths}}</td>
-                <td>{{player.mp_kda.assists}}</td>
-                <td>{{player.mp_kda.last_hits}}/{{player.mp_kda.denies}}</td>
-                <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
-                <td>{{player.mp_networth.gold_per_min}}</td>
-                <td>{{player.mp_lvlup.xp_per_min}}</td>
-                <td>{{player.hero_damage}}</td>
-                <td>{{player.tower_damage}}</td>
-                <td>{{player.hero_healing}}</td>
-                <td>
-                    <div>
-                        {% for item in player.inventory[:6] %}
-                        {% if item | get_item != 'ability_base' %}
-                        <img class="item_icon"
-                            src="/static/images/items/{{ item | get_item }}.png"
-                            alt="{{ item | get_item }}">
-                        {% endif %}
+                        {% set remaining_slots = 25 - player.mp_lvlup.ability_upgrades_arr|length %}
+                        {% if remaining_slots > 0 %}
+                        {% for i in range(remaining_slots) %}
+                        <td></td>
                         {% endfor %}
-                    </div>
-                    <div>
-                        {% for item in player.inventory[7:] %}
-                        {% if item | get_item != 'ability_base' %}
-                        <img class="item_icon"
-                            src="/static/images/items/{{ item | get_item }}.png"
-                            alt="{{ item | get_item }}">
                         {% endif %}
+
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="container mx-auto nodata">
+            <h1>Данных нет</h1>
+        </div>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="items" role="tabpanel" aria-labelledby="items-tab">
+        <span class="table-title">Силы Света - Журнал покупок</span>
+        <div class="container table-responsive">
+            <table class="table">
+                {% set puring = match.id | purchase_in_game %}
+                {% set max_puring = puring | max_value %}
+                <thead>
+                    <tr>
+                        <th scope="col">Игрок</th>
+                        {% for i in range(0,max_puring + 1,5) %}
+                        <th scope="col">{{ i }}</th>
                         {% endfor %}
-                    </div>
-                </td>
-                <td>
-                    <img class="item_icon"
-                        src="/static/images/items/{{ player.inventory[6] | get_item }}.png"
-                        alt="{{ player.inventory[6] | get_item }}">
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(5,10,1) %}
+                    <tr>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon" src="/static/images/heroes/{{ match.players[i].hero_id | get_heroes }}.png"
+                                    alt="{{ match.players[i].hero_id | get_heroes}}">
+                                <span>{{match.players[i].personaname}}</span>
+                            </div>
+                        </td>
+                        {% for key in puring[i] %}
+                        <td>
+                            {% for item in puring[i][key] %}
+                            {% if not 'recipe_' in item | get_pur_name %}
+                            <div class="item-by-time">
+                                <img class="item_icon" src="/static/images/items/{{ item | get_pur_name }}.png"
+                                alt="{{ item | get_pur_name }}">
+                                <span> {{ item | get_pur_time }} </span>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <span class="table-title">Силы Тьмы - Журнал покупок</span>
+        <div class="container table-responsive">
+            <table class="table">
+                {% set puring = match.id | purchase_in_game %}
+                {% set max_puring = puring | max_value %}
+                <thead>
+                    <tr>
+                        <th scope="col">Игрок</th>
+                        {% for i in range(0,max_puring + 1,5) %}
+                        <th scope="col">{{ i }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(5) %}
+                    <tr>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon" src="/static/images/heroes/{{ match.players[i].hero_id | get_heroes }}.png"
+                                    alt="{{ match.players[i].hero_id | get_heroes}}">
+                                <span>{{match.players[i].personaname}}</span>
+                            </div>
+                        </td>
+                        {% for key in puring[i] %}
+                        <td>
+                            {% for item in puring[i][key] %}
+                            {% if not 'recipe_' in item | get_pur_name %}
+                            <div class="item-by-time">
+                                <img class="item_icon" src="/static/images/items/{{ item | get_pur_name }}.png"
+                                alt="{{ item | get_pur_name }}">
+                                <span> {{ item | get_pur_time }} </span>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="graph" role="tabpanel" aria-labelledby="graph-tab">...</div>
 </div>
 
-<div class="container table-responsive">
-    <span class="table-title">Силы Света - Порядок изучения способностей</span>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Игрок</th>
-                {% for i in range(25) %}
-                <th scope="col"></th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in match.players[0:5] %}
-            <tr>
-                <td class="player-td">
-                    <div>
-                        <img class="hero_icon"
-                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                            alt="{{player.hero_id | get_heroes}}">
-                        <span>{{player.personaname}}</span>
-                    </div>
-                </td data-value="{{ ability_name | get_ability_value}}">
-                {% for ability in player.mp_lvlup.ability_upgrades_arr %}
-                {% set ability_name = ability | get_ability %}
-                {% if 'special_bonus' not in ability_name %}
-                <td>
-                    <img class="ability_icon"
-                        src="/static/images/abilities/{{ ability_name }}.png"
-                        alt="{{ ability_name }}">
-                </td>
-                {% endif %}
-                {% if 'special_bonus' in ability_name %}
-                <td data-value="{{ ability_name | get_ability_value}}">
-                    <img class="ability_icon" src="/static/images/abilities/talent.jpg" alt="{{ ability_name }}">
-                </td>
-                {% endif %}
-                {% endfor %}
-
-                {% set remaining_slots = 25 - player.mp_lvlup.ability_upgrades_arr|length %}
-                {% if remaining_slots > 0 %}
-                {% for i in range(remaining_slots) %}
-                <td></td>
-                {% endfor %}
-                {% endif %}
-
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div class="container table-responsive">
-    <span class="table-title">Силы Тьмы - Порядок изучения способностей</span>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Игрок</th>
-                {% for i in range(25) %}
-                <th scope="col"></th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in match.players[5:] %}
-            <tr>
-                <td class="player-td">
-                    <div>
-                        <img class="hero_icon"
-                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                            alt="{{player.hero_id | get_heroes}}">
-                        <span>{{player.personaname}}</span>
-                    </div>
-                </td>
-                {% for ability in player.mp_lvlup.ability_upgrades_arr %}
-                {% set ability_name = ability | get_ability %}
-                {% if 'special_bonus' not in ability_name %}
-                <td>
-                    <img class="ability_icon"
-                        src="/static/images/abilities/{{ ability_name }}.png"
-                        alt="{{ ability_name }}">
-                </td>
-                {% endif %}
-                {% if 'special_bonus' in ability_name %}
-                <td data-value="{{ ability_name | get_ability_value}}">
-                    <img class="ability_icon" src="/static/images/abilities/talent.jpg" alt="{{ ability_name }}">
-                </td>
-                {% endif %}
-                {% endfor %}
-
-                {% set remaining_slots = 25 - player.mp_lvlup.ability_upgrades_arr|length %}
-                {% if remaining_slots > 0 %}
-                {% for i in range(remaining_slots) %}
-                <td></td>
-                {% endfor %}
-                {% endif %}
-
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 {% endif %}
 {% if match == None %}
 <div class="container mx-auto notfound">

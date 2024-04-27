@@ -3,46 +3,37 @@ import json
 import os
 import random
 import time
+from orm import session_factory
+from models import MatchORM,MatchPlayerORM,MatchPlayerNetworthORM
 
-def download_file(url, filename):
-    # Проверяем, существует ли уже файл с таким именем
-    if os.path.exists(f'static/images/items/{filename}.png'):
-        print(f"Файл {filename}.png уже существует.")
-        return False
 
-    # Создаем список различных User-Agent'ов для имитации поведения разных браузеров
-    user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/97.0.1072.76 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36",
-    ]
+def purchase_in_game(match_id):
+    with session_factory() as session:
+        match_ = session.get(MatchORM,match_id)
+        player_pbt_data = []
+        for player in match_.players:
+            plist = player.mp_networth.purchase_by_time
+            pbt_data = {0:[]}
+            for item in plist:
+                time = list(plist[item].keys())[0]
+                if(int(time) <= 20):
+                    pbt_data[0].append({time:plist[item][time]})
+                else:
+                    current_time = ((int(time) // 300) + 1) * 5
+                    if(not pbt_data.get(current_time)):
+                        pbt_data[current_time] = []
+                    pbt_data[current_time].append({time:plist[item][time]})
+            player_pbt_data.append(pbt_data)
+    return player_pbt_data
 
-    headers = {'User-Agent': random.choice(user_agents)}
-    time.sleep(random.uniform(0.05, 0.2))  # Задержка
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        with open(f'static/images/items/{filename}.png', 'wb') as f:
-            f.write(response.content)
-        print("Файл успешно сохранен как:", filename)
-        return False
-    else:
-        print("Файл не удалось сохранить:", filename)
-        return filename
+puring = purchase_in_game('7698921185')
 
-with open("dota/item_ids.json") as file_:
-    items = json.load(file_)
-    names = ''
-    for item_id in items:
-        item_name = items[item_id]
-        #src=f"https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/{ability_name}.png"
-        src=f"https://cdn.dota2.com/apps/dota2/images/items/{item_name}_lg.png"
-        if(not 'special_bonus_' in item_name):
-            res = download_file(src, item_name)
-            if res:
-                names += f'{res}\n'
-        else:
-            print(f"Файл {item_name} был пропущен")
-            pass
-    with open('names.txt', 'w') as f:
-        f.write(names)
+def max_value(puring):
+    return max(max(pur.keys()) for pur in puring)
+
+for pur in puring[:1]:
+    for key in pur:
+        for item in pur[key]:
+            key0 = list(item.keys())[0]
+            print(key0)
+            #print(item[key0])

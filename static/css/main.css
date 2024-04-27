@@ -1,10 +1,32 @@
+nav{
+    margin-right: -1rem;
+}
+
 body{
     background-color: #152032 !important;
     color: white !important;
+    overflow-x: hidden !important;
 }
 
+.nav-tabs{
+    margin-bottom: 1rem !important;
+}
+
+.nav-link {
+    color: white !important; 
+}
+
+.nav-link.active {
+    color: black !important;
+}
+
+.nav-link.disabled {
+    color: gray !important;
+}
+
+
 .container{
-    padding-top: 2rem;
+    padding-top: 1rem;
     margin-top: -1rem;
 }
 
@@ -28,6 +50,12 @@ body{
     text-align: center;
     padding: 0 !important;
     margin: 0 !important;
+}
+
+.table-responsive{
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-top: 1rem !important;
 }
 
 tr{
@@ -91,4 +119,36 @@ td{
 .notfound{
     margin-top: 30vh;
     text-align: center;
+}
+
+.nodata{
+    color: gray !important;
+    text-align: center;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+
+
+.item-by-time {
+    position: relative;
+    margin: 0.25rem;
+    width: 3.75rem;
+    height: 2.25rem;
+}
+
+.item-by-time img {
+    display: block;
+    width: 100%; 
+}
+
+.item-by-time span {
+    width: 100%;
+    font-size: x-small;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex; /* Используем flexbox для центрирования */
+    justify-content: center; /* Центрируем содержимое по горизонтали */
+    align-items: center; /* Центрируем содержимое по вертикали */
+    background-color: rgba(0, 0, 0, 0.75);
 }
