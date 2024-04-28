@@ -1,19 +1,22 @@
-nav{
-    margin-right: -1rem;
-}
-
 body{
     background-color: #152032 !important;
     color: white !important;
     overflow-x: hidden !important;
 }
 
+nav{
+    padding-left: 1rem;
+    overflow-x: hidden !important;
+}
+
 .nav-tabs{
-    margin-bottom: 1rem !important;
+    flex-wrap: nowrap !important;
+    overflow-x: scroll;
 }
 
 .nav-link {
-    color: white !important; 
+    white-space: nowrap;
+    color: white !important;
 }
 
 .nav-link.active {
@@ -24,8 +27,9 @@ body{
     color: gray !important;
 }
 
-
 .container{
+    padding: 0 !important;
+    margin:  0 !important;
     padding-top: 1rem;
     margin-top: -1rem;
 }
@@ -55,7 +59,6 @@ body{
 .table-responsive{
     margin: 0 !important;
     padding: 0 !important;
-    padding-top: 1rem !important;
 }
 
 tr{
@@ -66,10 +69,15 @@ th{
     background: linear-gradient(#29576f, #14273b) !important;
     color: white !important;
 }
+td:first-child{
+    background-color: #152032 !important;
+    color: white !important;
+    text-align: left !important;
+}
 td{
     background-color: #152032 !important;
     color: white !important;
-    white-space: nowrap;
+    text-align: center;
 }
 
 .table{
@@ -78,16 +86,20 @@ td{
 }
 
 .ability_icon{
-    width: 2rem;
-    height: 2rem;
+    width: 24px;
+    height: 24px;
 }
 .hero_icon{
-    width: 4rem;
-    height: 2rem;
+    width: 50px;
+    height: 30px;
 }
 .item_icon{
-    width: 3.25rem;
-    height: 1.75rem;
+    width: 33px;
+    height: 24px;
+}
+
+.player-td{
+    white-space: nowrap;
 }
 
 .kills-td{
@@ -128,12 +140,42 @@ td{
     padding-bottom: 1rem;
 }
 
+.player-div{
+    display: flex;
+    align-items: center;
+}
+
+.playername{
+    margin-left: 0.5rem;
+}
+
+.hero-div {
+    display: inline-block;
+    position: relative;
+    width: 50px;
+    height: 30px;
+}
+
+.hero-div  img {
+    display: block;
+    width: 100%; 
+}
+
+.hero-div span {
+    width: 100%;
+    font-size: small;
+    position: absolute;
+    bottom: 0;
+    justify-content: right;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.5);
+}
 
 .item-by-time {
     position: relative;
     margin: 0.25rem;
-    width: 3.75rem;
-    height: 2.25rem;
+    width: 50px;
+    height: 30px;
 }
 
 .item-by-time img {
@@ -147,8 +189,8 @@ td{
     position: absolute;
     bottom: 0;
     left: 0;
-    display: flex; /* Используем flexbox для центрирования */
-    justify-content: center; /* Центрируем содержимое по горизонтали */
-    align-items: center; /* Центрируем содержимое по вертикали */
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
     background-color: rgba(0, 0, 0, 0.75);
 }

@@ -248,7 +248,7 @@ def create_inventory(item_arr):
 def get_profile_names(player):
     if(player.get('account_id')!= None):
         return player
-    else: return {'account_id': "Unknown",'personaname': "Anonymous",'name': None}
+    else: return {'account_id': "Unknown",'personaname': "Аноним",'name': None}
 
 #Возвращает имя в стиме и аватар
 def get_profile(profile_id):
