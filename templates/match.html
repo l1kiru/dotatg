@@ -52,8 +52,10 @@
             role="tab" aria-controls="main" aria-selected="true">Общая информация</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button"
-            role="tab" aria-controls="skills" aria-selected="true">Прокачка</button>
+        <button class="nav-link
+        {% if match.players[0].mp_lvlup.ability_upgrades_arr == None %} disabled {% endif %}" id="skills-tab"
+            data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab" aria-controls="skills"
+            aria-selected="true">Прокачка</button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link 
@@ -72,16 +74,18 @@
         <span class="table-title victory-text-radiant">Силы Света</span>
         <ul class="nav nav-tabs" id="table-myTab-radiant" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="table-main-tab" data-bs-toggle="tab" data-bs-target="#table-main-radiant"
-                    type="button" role="tab" aria-controls="table-main-radiant" aria-selected="true">Обзор</button>
+                <button class="nav-link active" id="table-main-tab" data-bs-toggle="tab"
+                    data-bs-target="#table-main-radiant" type="button" role="tab" aria-controls="table-main-radiant"
+                    aria-selected="true">Обзор</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="table-farm-tab" data-bs-toggle="tab" data-bs-target="#table-farm-radiant"
                     type="button" role="tab" aria-controls="table-farm-radiant" aria-selected="false">Фарм</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="table-damage-tab" data-bs-toggle="tab" data-bs-target="#table-damage-radiant"
-                    type="button" role="tab" aria-controls="table-damage-radiant" aria-selected="false">Урон</button>
+                <button class="nav-link" id="table-damage-tab" data-bs-toggle="tab"
+                    data-bs-target="#table-damage-radiant" type="button" role="tab" aria-controls="table-damage-radiant"
+                    aria-selected="false">Урон</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="table-item-tab" data-bs-toggle="tab" data-bs-target="#table-item-radiant"
@@ -89,7 +93,8 @@
             </li>
         </ul>
         <div class="tab-content" id="table-myTabContent">
-            <div class="tab-pane fade show active" id="table-main-radiant" role="tabpanel" aria-labelledby="table-main-tab">
+            <div class="tab-pane fade show active" id="table-main-radiant" role="tabpanel"
+                aria-labelledby="table-main-tab">
                 <div class="container table-responsive">
                     <table class="table">
                         <thead>
@@ -102,16 +107,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(5) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[:5] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -122,10 +125,18 @@
                                 <td>{{player.mp_kda.assists}}</td>
                                 <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>{{ match.players[:5]|map(attribute='mp_kda.kills')|sum }}</td>
+                                <td>{{ match.players[:5]|map(attribute='mp_kda.deaths')|sum }}</td>
+                                <td>{{ match.players[:5]|map(attribute='mp_kda.assists')|sum }}</td>
+                                <td>{{ match.players[:5]|map(attribute='mp_networth.net_worth')|sum | networth_round}} к
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -141,16 +152,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(5) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[:5] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -160,10 +169,17 @@
                                 <td>{{player.mp_networth.gold_per_min}}</td>
                                 <td>{{player.mp_lvlup.xp_per_min}}</td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>{{ match.players[:5]|map(attribute='mp_kda.last_hits')|sum
+                                    }}/{{match.players[:5]|map(attribute='mp_kda.denies')|sum }}</td>
+                                <td>{{ match.players[:5]|map(attribute='mp_networth.gold_per_min')|sum }}</td>
+                                <td>{{ match.players[:5]|map(attribute='mp_lvlup.xp_per_min')|sum }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -179,16 +195,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(5) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[:5] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -198,10 +212,16 @@
                                 <td>{{player.tower_damage}}</td>
                                 <td>{{player.hero_healing}}</td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>{{ match.players[:5]|map(attribute='hero_damage')|sum | networth_round}} к</td>
+                                <td>{{ match.players[:5]|map(attribute='tower_damage')|sum | networth_round}} к</td>
+                                <td>{{ match.players[:5]|map(attribute='hero_healing')|sum | networth_round}} к</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -216,16 +236,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(5) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[:5] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -255,8 +273,6 @@
                                         alt="{{ player.inventory[6] | get_item }}">
                                 </td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
@@ -267,8 +283,9 @@
         <span class="table-title victory-text-dire">Силы Тьмы</span>
         <ul class="nav nav-tabs" id="table-myTab-dire" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="table-main-tab" data-bs-toggle="tab" data-bs-target="#table-main-dire"
-                    type="button" role="tab" aria-controls="table-main-dire" aria-selected="true">Обзор</button>
+                <button class="nav-link active" id="table-main-tab" data-bs-toggle="tab"
+                    data-bs-target="#table-main-dire" type="button" role="tab" aria-controls="table-main-dire"
+                    aria-selected="true">Обзор</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="table-farm-tab" data-bs-toggle="tab" data-bs-target="#table-farm-dire"
@@ -284,7 +301,8 @@
             </li>
         </ul>
         <div class="tab-content" id="table-myTabContent">
-            <div class="tab-pane fade show active" id="table-main-dire" role="tabpanel" aria-labelledby="table-main-tab">
+            <div class="tab-pane fade show active" id="table-main-dire" role="tabpanel"
+                aria-labelledby="table-main-tab">
                 <div class="container table-responsive">
                     <table class="table">
                         <thead>
@@ -297,16 +315,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(128,133,1) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[5:] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -317,10 +333,18 @@
                                 <td>{{player.mp_kda.assists}}</td>
                                 <td class="networth-td">{{ player.mp_networth.net_worth | networth_round }} к</td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>{{ match.players[5:]|map(attribute='mp_kda.kills')|sum }}</td>
+                                <td>{{ match.players[5:]|map(attribute='mp_kda.deaths')|sum }}</td>
+                                <td>{{ match.players[5:]|map(attribute='mp_kda.assists')|sum }}</td>
+                                <td>{{ match.players[5:]|map(attribute='mp_networth.net_worth')|sum | networth_round}} к
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -336,16 +360,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(128,133,1) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[5:] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -355,10 +377,17 @@
                                 <td>{{player.mp_networth.gold_per_min}}</td>
                                 <td>{{player.mp_lvlup.xp_per_min}}</td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>{{ match.players[5:]|map(attribute='mp_kda.last_hits')|sum
+                                    }}/{{match.players[5:]|map(attribute='mp_kda.denies')|sum }}</td>
+                                <td>{{ match.players[5:]|map(attribute='mp_networth.gold_per_min')|sum }}</td>
+                                <td>{{ match.players[5:]|map(attribute='mp_lvlup.xp_per_min')|sum }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -374,16 +403,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(128,133,1) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[5:] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -393,10 +420,16 @@
                                 <td>{{player.tower_damage}}</td>
                                 <td>{{player.hero_healing}}</td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td>{{ match.players[5:]|map(attribute='hero_damage')|sum | networth_round }} к</td>
+                                <td>{{ match.players[5:]|map(attribute='tower_damage')|sum | networth_round }} к</td>
+                                <td>{{ match.players[5:]|map(attribute='hero_healing')|sum | networth_round}} к</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -411,16 +444,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in range(128,133,1) %}
-                            {% for player in match.players %}
-                            {% if player.player_slot == i %}
+                            {% for player in match.players[5:] %}
                             <tr>
                                 <td class="player-td">
                                     <div class="player-div">
                                         <div class="hero-div">
                                             <img class="hero_icon"
-                                            src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
-                                            alt="{{player.hero_id | get_heroes}}">
+                                                src="/static/images/heroes/{{ player.hero_id | get_heroes }}.png"
+                                                alt="{{player.hero_id | get_heroes}}">
                                             <span> {{ player.mp_lvlup.level }} </span>
                                         </div>
                                         <span class="playername">{{player.personaname}}</span>
@@ -450,8 +481,6 @@
                                         alt="{{ player.inventory[6] | get_item }}">
                                 </td>
                             </tr>
-                            {% endif %}
-                            {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
@@ -461,7 +490,6 @@
     </div>
     <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
         <span class="table-title victory-text-radiant">Силы Света - Порядок изучения способностей</span>
-        {% if match.players[0].mp_lvlup.ability_upgrades_arr != None %}
         <div class="container table-responsive">
             <table class="table">
                 <thead>
@@ -473,9 +501,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in range(5) %}
-                    {% for player in match.players %}
-                    {% if player.player_slot == i %}
+                    {% for player in match.players[:5] %}
                     <tr>
                         <td class="player-td">
                             <div>
@@ -509,19 +535,12 @@
 
 
                     </tr>
-                    {% endif %}
-                    {% endfor %}
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
-        <div class="container mx-auto nodata">
-            <h1>Данных нет</h1>
-        </div>
-        {% endif %}
+
         <span class="table-title victory-text-dire">Силы Тьмы - Порядок изучения способностей</span>
-        {% if match.players[0].mp_lvlup.ability_upgrades_arr != None %}
         <div class="container table-responsive">
             <table class="table">
                 <thead>
@@ -533,9 +552,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in range(128,133,1) %}
-                    {% for player in match.players %}
-                    {% if player.player_slot == i %}
+                    {% for player in match.players[5:] %}
                     <tr>
                         <td class="player-td">
                             <div>
@@ -569,62 +586,22 @@
 
 
                     </tr>
-                    {% endif %}
-                    {% endfor %}
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
-        <div class="container mx-auto nodata">
-            <h1>Данных нет</h1>
-        </div>
-        {% endif %}
     </div>
     <div class="tab-pane fade" id="items" role="tabpanel" aria-labelledby="items-tab">
-        <span class="table-title victory-text-radiant">Силы Света - Журнал покупок</span>
-        <div class="container table-responsive">
-            <table class="table">
-                {% set puring = match.id | purchase_in_game %}
-                {% set max_puring = puring | max_value %}
-                <thead>
-                    <tr>
-                        <th scope="col">Игрок</th>
-                        {% for i in range(0,max_puring + 1,5) %}
-                        <th scope="col">{{ i }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in range(5,10,1) %}
-                    <tr>
-                        <td class="player-td">
-                            <div>
-                                <img class="hero_icon"
-                                    src="/static/images/heroes/{{ match.players[i].hero_id | get_heroes }}.png"
-                                    alt="{{ match.players[i].hero_id | get_heroes}}">
-                                <span>{{match.players[i].personaname}}</span>
-                            </div>
-                        </td>
-                        {% for key in puring[i] %}
-                        <td>
-                            {% for item in puring[i][key] %}
-                            {% if not 'recipe_' in item | get_pur_name %}
-                            <div class="item-by-time">
-                                <img class="item_icon" src="/static/images/items/{{ item | get_pur_name }}.png"
-                                    alt="{{ item | get_pur_name }}">
-                                <span> {{ item | get_pur_time }} </span>
-                            </div>
-                            {% endif %}
-                            {% endfor %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="overlay row">
+            <div class="col-9 content">
+                Показывать расходуемые предметы
+            </div>
+            <div class="col-3 checkbox">
+                <input type="checkbox" id="toggleButton">
+                <label for="toggleButton"></label>
+            </div>
         </div>
-        <span class="table-title victory-text-dire">Силы Тьмы - Журнал покупок</span>
+        <span class="table-title victory-text-radiant">Силы Света - Журнал покупок</span>
         <div class="container table-responsive">
             <table class="table">
                 {% set puring = match.id | purchase_in_game %}
@@ -648,17 +625,74 @@
                                 <span>{{match.players[i].personaname}}</span>
                             </div>
                         </td>
-                        {% for key in puring[i] %}
+                        {% for j in range(0,max_puring + 1,5) %}
                         <td>
-                            {% for item in puring[i][key] %}
+                            {% for item in puring[i][j] %}
                             {% if not 'recipe_' in item | get_pur_name %}
-                            <div class="item-by-time">
-                                <img class="item_icon" src="/static/images/items/{{ item | get_pur_name }}.png"
-                                    alt="{{ item | get_pur_name }}">
-                                <span> {{ item | get_pur_time }} </span>
+                            {% set consumables = ['tpscroll', 'clarity', 'faerie_fire', 'smoke_of_deceit',
+                            'ward_observer', 'ward_sentry', 'enchanted_mango', 'flask', 'tango', 'blood_grenade',
+                            'dust'] %}
+                            {% if item | get_pur_name in consumables %}
+                            <div class="item-by-time consumables hidden">
+                                {% else %}
+                                <div class="item-by-time">
+                                    {% endif %}
+                                    <img class="item_icon" src="/static/images/items/{{ item | get_pur_name }}.png"
+                                        alt="{{ item | get_pur_name }}">
+                                    <span> {{ item | get_pur_time }} </span>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <span class="table-title victory-text-dire">Силы Тьмы - Журнал покупок</span>
+        <div class="container table-responsive">
+
+            <table class="table">
+                {% set puring = match.id | purchase_in_game %}
+                {% set max_puring = puring | max_value %}
+                <thead>
+                    <tr>
+                        <th scope="col">Игрок</th>
+                        {% for i in range(0,max_puring + 1,5) %}
+                        <th scope="col">{{ i }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(5,10,1) %}
+                    <tr>
+                        <td class="player-td">
+                            <div>
+                                <img class="hero_icon"
+                                    src="/static/images/heroes/{{ match.players[i].hero_id | get_heroes }}.png"
+                                    alt="{{ match.players[i].hero_id | get_heroes}}">
+                                <span>{{match.players[i].personaname}}</span>
                             </div>
-                            {% endif %}
-                            {% endfor %}
+                        </td>
+                        {% for j in range(0,max_puring + 1,5) %}
+                        <td>
+                            {% for item in puring[i][j] %}
+                            {% if not 'recipe_' in item | get_pur_name %}
+                            {% set consumables = ['tpscroll', 'clarity', 'faerie_fire', 'smoke_of_deceit',
+                            'ward_observer', 'ward_sentry', 'enchanted_mango', 'flask', 'tango', 'blood_grenade',
+                            'dust'] %}
+                            {% if item | get_pur_name in consumables %}
+                            <div class="item-by-time consumables hidden">
+                                {% else %}
+                                <div class="item-by-time">
+                                    {% endif %}
+                                    <img class="item_icon" src="/static/images/items/{{ item | get_pur_name }}.png"
+                                        alt="{{ item | get_pur_name }}">
+                                    <span> {{ item | get_pur_time }} </span>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
                         </td>
                         {% endfor %}
                     </tr>

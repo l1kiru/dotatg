@@ -9,6 +9,10 @@ nav{
     overflow-x: hidden !important;
 }
 
+.hidden {
+    display: none;
+}
+
 .nav-tabs{
     flex-wrap: nowrap !important;
     overflow-x: scroll;
@@ -64,6 +68,7 @@ nav{
 tr{
     background: linear-gradient(#29576f, #14273b) !important;
     color: white !important;
+    text-align: center;
 }
 th{
     background: linear-gradient(#29576f, #14273b) !important;
@@ -80,9 +85,10 @@ td{
     text-align: center;
 }
 
-.table{
+.table{ 
     background-color: #152032 !important;
     color: white !important;
+    font-size: 14px;
 }
 
 .ability_icon{
@@ -96,10 +102,6 @@ td{
 .item_icon{
     width: 33px;
     height: 24px;
-}
-
-.player-td{
-    white-space: nowrap;
 }
 
 .kills-td{
@@ -149,6 +151,12 @@ td{
     margin-left: 0.5rem;
 }
 
+.player-td{
+    position: sticky !important;
+    left: 0;
+    z-index: 1;
+}
+
 .hero-div {
     display: inline-block;
     position: relative;
@@ -193,4 +201,67 @@ td{
     justify-content: center; 
     align-items: center; 
     background-color: rgba(0, 0, 0, 0.75);
+}
+
+.tab-pane{
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    width: 160px;
+    top: 8px;
+    left: 60%;
+    transform: translateX(-60%);
+    background-color: rgba(0, 0, 0, 0.45); 
+    padding: 10px; 
+    border-radius: 8px; 
+    z-index: 1;
+}
+  
+.overlay input[type="checkbox"] {
+    display: none;
+}
+  
+.overlay label {
+    cursor: pointer;
+    display: inline-block;
+    width: 40px;
+    height: 20px; 
+    background-color: #ccc;
+    position: relative;
+    border-radius: 20px;
+}
+  
+.overlay label:after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px; /* Ширина самого переключателя */
+    height: 16px; /* Высота самого переключателя */
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+  
+.overlay input:checked + label {
+    background-color: #2196F3;
+}
+  
+.overlay input:checked + label:after {
+    transform: translateX(20px); /* Сдвигаем переключатель вправо */
+}
+
+.content{
+    font-size: 13px;
+    width: 80px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.checkbox{
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 14px !important;
 }

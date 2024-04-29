@@ -31,9 +31,14 @@ puring = purchase_in_game('7698921185')
 def max_value(puring):
     return max(max(pur.keys()) for pur in puring)
 
-for pur in puring[:1]:
-    for key in pur:
-        for item in pur[key]:
-            key0 = list(item.keys())[0]
-            print(key0)
-            #print(item[key0])
+for pur in puring:
+    print(list(pur.keys()))
+
+
+def get_void_pur(current_pur,max_value):
+    lmax = max(current_pur.keys())
+    counter = 0
+    while(lmax != max_value):
+        lmax += 5
+        counter +=1
+    return counter

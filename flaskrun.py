@@ -115,6 +115,7 @@ def get_pur_time(item):
 
 app.jinja_env.filters['get_pur_time'] = get_pur_time
 
+
 @app.route('/match/<int:match_id>')
 def index(match_id):
     match_ = None
