@@ -30,10 +30,10 @@ with open("dota/heroes.json") as file_:
     }
     data = json.load(file_)
     for hero_id in list(data.keys()):
+        print(f'hero_id: {hero_id}')
         url = f"https://api.opendota.com/api/heroes/{hero_id}/matches"
         req = requests.get(url, params=params, headers=headers).json()
         for game in req:
-            print(game['match_id'])
             match_full_processing(game['match_id'])
 
 

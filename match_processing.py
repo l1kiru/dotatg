@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import json
+import random
 import requests
 from dotenv import load_dotenv
 
@@ -14,86 +15,119 @@ op_api_key= os.getenv('OPENDOTAAPIKEY')
 steam_api_key= os.getenv('STEAMAPIKEY')
 
 def match_full_processing(match_id):
-    with session_factory() as session:
-        if(not session.get(MatchORM,match_id)):
-            #Получаем данные из реплея если есть ссылка, иначе Null
-            parsed_data = parse_replay(match_id)
-            #Запрашиваем информацию о матче с dota api
-            answer = get_match(match_id)
-            steam_profiles_arr = []
-            min_ = answer.get('duration') // 60
-            duration = f"{min_ // 3600}:{min_ % 60}:{answer.get('duration') % 60}"
-            match_ = MatchORM(
-                id=answer.get('match_id'),game_mode=answer.get('game_mode'),
-                lobby_type=answer.get('lobby_type'),league_id=answer.get('leagueid'),
-                series_id=answer.get('series_id'),series_type=answer.get('series_type'),
-                start_time=answer.get('start_time'),
-                match_seq_num=answer.get('match_seq_num'),duration=duration,
-                dire_score=answer.get('dire_score'),dire_team_id=answer.get('dire_team_id'),
-                radiant_score=answer.get('radiant_score'),radiant_team_id=answer.get('radiant_team_id'),
-                radiant_win= True if(answer.get('radiant_win') == 0) else False,
-                patch=answer.get('patch'),region=answer.get('region'),replay_url=answer.get('replay_url'),
-                picks_bans=answer.get('picks_bans')
-            )
-            for player in answer['players']:
-                account_names = get_profile_names(player)
-                player_in_match = MatchPlayerORM(
-                    rank_tier=player.get('rank_tier'),
-                    isradiant= True if(player.get('isRadiant') == 0) else False,
-                    player_slot=player.get('player_slot'),party_id=player.get('party_id'),
-                    party_size=player.get('party_size'),
-                    personaname=account_names.get('personaname') if account_names.get('personaname') else 'Аноним',
-                    name=account_names.get('name'),hero_id=player.get('hero_id'),
-                    inventory=create_inventory(
-                        [player.get('item_0'),player.get('item_1'),player.get('item_2'),player.get('item_3'),
-                        player.get('item_4'),player.get('item_5'),player.get('item_neutral'),
-                        player.get('backpack_0'),player.get('backpack_1'),player.get('backpack_2')]),
-                    hero_damage=player.get('hero_damage'),hero_healing=player.get('hero_healing'),
-                    tower_damage=player.get('tower_damage'),
-                    movement_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='movement')
+    status = 0
+    print(f"Поступил запрос на match_id: {match_id}")
+    try:
+        with session_factory() as session:
+            current_match = session.get(MatchORM,match_id)
+            if(not current_match):
+                #Получаем данные из реплея если есть ссылка, иначе Null
+                parsed_data = parse_replay(match_id)
+                #Запрашиваем информацию о матче с dota api
+                answer = get_match(match_id)
+                if("{'error': 'Not Found'}" in str(answer)):
+                    return "Неправльный id матча, попробуйте еще раз."
+                steam_profiles_arr = []
+                min_ = answer.get('duration') // 60
+                duration = f"{min_ // 60}:{min_ % 60}:{answer.get('duration') % 60}"
+                match_ = MatchORM(
+                    id=answer.get('match_id'),game_mode=answer.get('game_mode'),
+                    lobby_type=answer.get('lobby_type'),league_id=answer.get('leagueid'),
+                    series_id=answer.get('series_id'),series_type=answer.get('series_type'),
+                    start_time=answer.get('start_time'),
+                    match_seq_num=answer.get('match_seq_num'),duration=duration,
+                    dire_score=answer.get('dire_score'),dire_team_id=answer.get('dire_team_id'),
+                    radiant_score=answer.get('radiant_score'),radiant_team_id=answer.get('radiant_team_id'),
+                    radiant_win= False if(answer.get('radiant_win') == 0) else True,
+                    patch=answer.get('patch'),region=answer.get('region'),replay_url=answer.get('replay_url'),
+                    picks_bans=answer.get('picks_bans')
                 )
-                player_kda = MatchPlayerKdaORM(
-                    kills=player.get('kills'),deaths=player.get('deaths'),assists=player.get('assists'),
-                    last_hits=player.get('last_hits'),denies=player.get('denies'),
-                    kills_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='kills_log'),
-                    lhts_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='lhts')
-                )
-                player_lvlup = MatchPlayerLvlUpORM(
-                    level=player.get('level'),xp_per_min=player.get('xp_per_min'),
-                    ability_upgrades_arr=player.get('ability_upgrades_arr')
-                )
-                player_networth = MatchPlayerNetworthORM(
-                    net_worth=player.get('net_worth'),gold_per_min=player.get('gold_per_min'),
-                    networth_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='networth'),
-                    purchase_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='purchase_log'),
-                    additional_units=get_additional_units(player['hero_id'],match_id)
-                )
-                player_in_match.mp_kda = player_kda
-                player_in_match.mp_lvlup = player_lvlup
-                player_in_match.mp_networth = player_networth
-                steam_profile = None
-                match_.players.append(player_in_match)
-                #Получаем данные профиля
-                if(player.get('account_id')!= None and player.get('account_id') != "Unknown"):
-                    plr = get_profile(player['account_id'])
-                    try:
-                        steam_profile = session.get(ProfileORM,player.get('account_id'))
-                        steam_profile.personaname = plr['personaname']
-                        steam_profile.prof_name = plr['name']
-                        steam_profile.avatar_src = plr['avatar_src']
-                        steam_profile.played_matches.append(player_in_match)
-                    except:
-                        steam_profile = ProfileORM(
-                            account_id=player.get('account_id'),personaname=plr['personaname'],
-                            prof_name=plr['name'],avatar_src=plr['avatar_src'])
-                        steam_profile.played_matches.append(player_in_match)
-                        steam_profiles_arr.append(steam_profile)
-            session.add(match_)
-            session.add_all(steam_profiles_arr)
-            session.commit()
+                for player in answer['players']:
+                    account_names = get_profile_names(player)
+                    player_in_match = MatchPlayerORM(
+                        rank_tier=player.get('rank_tier'),
+                        isradiant= False if(player.get('isRadiant') == 0) else True,
+                        player_slot=player.get('player_slot'),party_id=player.get('party_id'),
+                        party_size=player.get('party_size'),
+                        personaname= (account_names.get('personaname')) if account_names.get('personaname') else 'Аноним',
+                        name=account_names.get('name'),hero_id=player.get('hero_id'),
+                        inventory=create_inventory(
+                            [player.get('item_0'),player.get('item_1'),player.get('item_2'),player.get('item_3'),
+                            player.get('item_4'),player.get('item_5'),player.get('item_neutral'),
+                            player.get('backpack_0'),player.get('backpack_1'),player.get('backpack_2')]),
+                        hero_damage=player.get('hero_damage'),hero_healing=player.get('hero_healing'),
+                        tower_damage=player.get('tower_damage'),
+                        movement_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='movement')
+                    )
+                    player_kda = MatchPlayerKdaORM(
+                        kills=player.get('kills'),deaths=player.get('deaths'),assists=player.get('assists'),
+                        last_hits=player.get('last_hits'),denies=player.get('denies'),
+                        kills_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='kills_log'),
+                        lhts_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='lhts')
+                    )
+                    player_lvlup = MatchPlayerLvlUpORM(
+                        level=player.get('level'),xp_per_min=player.get('xp_per_min'),
+                        ability_upgrades_arr=player.get('ability_upgrades_arr')
+                    )
+                    player_networth = MatchPlayerNetworthORM(
+                        net_worth=player.get('net_worth'),gold_per_min=player.get('gold_per_min'),
+                        networth_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='networth'),
+                        purchase_by_time=get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='purchase_log'),
+                        additional_units=get_additional_units(player['hero_id'],match_id)
+                    )
+                    player_in_match.mp_kda = player_kda
+                    player_in_match.mp_lvlup = player_lvlup
+                    player_in_match.mp_networth = player_networth
+                    steam_profile = None
+                    match_.players.append(player_in_match)
+                    #Получаем данные профиля
+                    if(player.get('account_id')!= None and player.get('account_id') != "Unknown"):
+                        plr = get_profile(player['account_id'])
+                        try:
+                            steam_profile = session.get(ProfileORM,player.get('account_id'))
+                            steam_profile.personaname = plr['personaname'] if plr['personaname'] else 'Аноним'
+                            steam_profile.prof_name = plr['name']
+                            steam_profile.avatar_src = plr['avatar_src']
+                            steam_profile.played_matches.append(player_in_match)
+                        except:
+                            steam_profile = ProfileORM(
+                                account_id=player.get('account_id'),personaname=plr['personaname'] if plr['personaname'] else 'Аноним',
+                                prof_name=plr['name'],avatar_src=plr['avatar_src'])
+                            steam_profile.played_matches.append(player_in_match)
+                            steam_profiles_arr.append(steam_profile)
+                session.add(match_)
+                session.add_all(steam_profiles_arr)
+                session.commit()
+                if(get_parsed_data(hero_id=player['hero_id'],parsed_data=parsed_data,who='movement')):
+                    status = 2
+                else:
+                    status = 1
+            else:
+                if(current_match.players[0].movement_by_time):
+                    return "Этот матч уже есть в базе."
+                else:
+                    days = (datetime.now() - datetime.fromtimestamp(current_match.start_time)).days 
+                    parsed_data = parse_replay(match_id)
+                    if(parsed_data):
+                        for player in current_match.players:
+                            player.movement_by_time = get_parsed_data(hero_id=player.hero_id,parsed_data=parsed_data,who='movement')
+                            player.mp_kda.kills_by_time = get_parsed_data(hero_id=player.hero_id,parsed_data=parsed_data,who='kills_log')
+                            player.mp_kda.lhts_by_time = get_parsed_data(hero_id=player.hero_id,parsed_data=parsed_data,who='lhts')
+                            player.mp_networth.networth_by_time = get_parsed_data(hero_id=player.hero_id,parsed_data=parsed_data,who='networth')
+                            player.mp_networth.purchase_by_time = get_parsed_data(hero_id=player.hero_id,parsed_data=parsed_data,who='purchase_log')
+                            session.commit()
+                            return f"Этот матч уже есть в базе, данные обновлены."
+                    elif(days >= 7 and not parsed_data):
+                        return f"Этот матч уже есть базе, но не все данные были записаны. Прошло больше 7 дней ({days}) со старта матча. Ссылка на реплей удалена. Нельзя получить расширенные данные."
+                    else:
+                        return f"Этот матч уже в базе данных, но не все данные были записаны. Не удалось получить ссылку на запись, попробуйте еще раз позже."
+        if(status == 2):
+            return "Матч обработан."
         else:
-            return "Такой матч уже есть в базе."
-    return "Матч обработан."
+            return "Матч обработан, но не все данные были записаны."
+    except Exception as _ex:
+        print(_ex)
+        return "Неизвестная ошибка."
 
 async def match_full_processing_async(match_id):
     status = 0
@@ -280,8 +314,28 @@ def get_profile(profile_id):
 
 #Возвращает информацию о определенном матче
 def get_match(match_id):
+    user_agents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/97.0.4692.71 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/96.0.4664.110 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/97.0.4692.71 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/96.0.4664.110 Safari/537.36"
+    ]
+    random_user_agent = random.choice(user_agents)
+    headers = {
+    "User-Agent": random_user_agent,
+    }
+    params = {
+    "api_key": op_api_key 
+    }
     try:
-        return requests.get(url=f"https://api.opendota.com/api/matches/{match_id}?api_key={op_api_key}").json()
+        url = f"https://api.opendota.com/api/matches/{match_id}"
+        return requests.get(url, params=params, headers=headers).json()
     except:
         print("[get_match()] Неправильный match_id")
         return None
