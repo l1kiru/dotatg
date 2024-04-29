@@ -93,9 +93,9 @@ class ProfileORM(Base):
     account_id: Mapped[int] = mapped_column(BigInteger,primary_key=True)
     played_matches: Mapped[list["MatchPlayerORM"]] = relationship(back_populates="account_",uselist=True,lazy='selectin')
 
-    personaname: Mapped[str] = mapped_column(String(60))
+    personaname: Mapped[str] = mapped_column(String(60), nullable=True)
     prof_name: Mapped[str] = mapped_column(String(60),nullable=True)
-    avatar_src: Mapped[str] = mapped_column(String(120))
+    avatar_src: Mapped[str] = mapped_column(String(120), nullable=True)
 
 class TelegramUserORM(Base):
     __tablename__ = "TelegramUser"

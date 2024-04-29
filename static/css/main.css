@@ -15,12 +15,13 @@ nav{
 
 .nav-tabs{
     flex-wrap: nowrap !important;
-    overflow-x: scroll;
 }
 
 .nav-link {
     white-space: nowrap;
     color: white !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
 }
 
 .nav-link.active {

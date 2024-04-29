@@ -41,7 +41,8 @@ def match_full_processing(match_id):
                     rank_tier=player.get('rank_tier'),
                     isradiant= True if(player.get('isRadiant') == 0) else False,
                     player_slot=player.get('player_slot'),party_id=player.get('party_id'),
-                    party_size=player.get('party_size'),personaname=account_names.get('personaname'),
+                    party_size=player.get('party_size'),
+                    personaname=account_names.get('personaname') if account_names.get('personaname') else 'Аноним',
                     name=account_names.get('name'),hero_id=player.get('hero_id'),
                     inventory=create_inventory(
                         [player.get('item_0'),player.get('item_1'),player.get('item_2'),player.get('item_3'),
@@ -128,7 +129,8 @@ async def match_full_processing_async(match_id):
                         rank_tier=player.get('rank_tier'),
                         isradiant= False if(player.get('isRadiant') == 0) else True,
                         player_slot=player.get('player_slot'),party_id=player.get('party_id'),
-                        party_size=player.get('party_size'),personaname=account_names.get('personaname'),
+                        party_size=player.get('party_size'),
+                        personaname= (account_names.get('personaname')) if account_names.get('personaname') else 'Аноним',
                         name=account_names.get('name'),hero_id=player.get('hero_id'),
                         inventory=create_inventory(
                             [player.get('item_0'),player.get('item_1'),player.get('item_2'),player.get('item_3'),
@@ -164,13 +166,13 @@ async def match_full_processing_async(match_id):
                         plr = get_profile(player['account_id'])
                         try:
                             steam_profile = session.get(ProfileORM,player.get('account_id'))
-                            steam_profile.personaname = plr['personaname']
+                            steam_profile.personaname = plr['personaname'] if plr['personaname'] else 'Аноним'
                             steam_profile.prof_name = plr['name']
                             steam_profile.avatar_src = plr['avatar_src']
                             steam_profile.played_matches.append(player_in_match)
                         except:
                             steam_profile = ProfileORM(
-                                account_id=player.get('account_id'),personaname=plr['personaname'],
+                                account_id=player.get('account_id'),personaname=plr['personaname'] if plr['personaname'] else 'Аноним',
                                 prof_name=plr['name'],avatar_src=plr['avatar_src'])
                             steam_profile.played_matches.append(player_in_match)
                             steam_profiles_arr.append(steam_profile)
